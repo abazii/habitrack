@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HABITrack - Pendamping Kebiasaan Realistis</title>
+    <title>HABITrack - Pendamping Kebiasaan Dinamis</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -12,7 +12,7 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
         :root {
-            /* Dark Theme (Default) */
+            /* Tema 1: Midnight (Default) */
             --bg: #030712;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
@@ -20,20 +20,60 @@
             --secondary: #ec4899;
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --orb-opacity: 0.15;
+            --orb-opacity: 0.2;
             --upi-filter: brightness(1);
         }
 
         [data-theme="light"] {
+            /* Tema 2: Zenith (Light) */
             --bg: #f8fafc;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --primary: #4f46e5;
             --secondary: #db2777;
-            --glass: rgba(255, 255, 255, 0.75);
+            --glass: rgba(255, 255, 255, 0.85);
             --glass-border: rgba(0, 0, 0, 0.05);
             --orb-opacity: 0.1;
             --upi-filter: brightness(0.9) contrast(1.1);
+        }
+
+        [data-theme="nature"] {
+            /* Tema 3: Nature */
+            --bg: #022c22;
+            --text-main: #ecfdf5;
+            --text-muted: #6ee7b7;
+            --primary: #10b981;
+            --secondary: #84cc16;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(16, 185, 129, 0.2);
+            --orb-opacity: 0.25;
+            --upi-filter: brightness(1);
+        }
+
+        [data-theme="ocean"] {
+            /* Tema 4: Ocean */
+            --bg: #0c4a6e;
+            --text-main: #f0f9ff;
+            --text-muted: #7dd3fc;
+            --primary: #0ea5e9;
+            --secondary: #2dd4bf;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(14, 165, 233, 0.2);
+            --orb-opacity: 0.2;
+            --upi-filter: brightness(1);
+        }
+
+        [data-theme="sunset"] {
+            /* Tema 5: Sunset */
+            --bg: #450a0a;
+            --text-main: #fff7ed;
+            --text-muted: #fdba74;
+            --primary: #f43f5e;
+            --secondary: #fb923c;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(244, 63, 94, 0.2);
+            --orb-opacity: 0.25;
+            --upi-filter: brightness(1);
         }
 
         body {
@@ -42,8 +82,13 @@
             color: var(--text-main);
             overflow: hidden;
             -webkit-tap-highlight-color: transparent;
-            transition: background-color 0.5s ease, color 0.5s ease;
+            transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), color 0.6s ease;
         }
+
+        /* --- UI Elements Linked to Theme Accent --- */
+        .text-accent { color: var(--primary); transition: color 0.6s ease; }
+        .border-accent { border-color: var(--primary); transition: border-color 0.6s ease; }
+        .bg-accent { background-color: var(--primary); transition: background-color 0.6s ease; }
 
         /* Morphing Liquid Background */
         .liquid-container {
@@ -56,11 +101,11 @@
 
         .orb {
             position: absolute;
-            width: 450px;
-            height: 450px;
-            filter: blur(80px);
+            width: 500px;
+            height: 500px;
+            filter: blur(100px);
             opacity: var(--orb-opacity);
-            transition: background-color 0.8s ease, opacity 0.5s ease;
+            transition: background-color 1.2s ease, opacity 0.8s ease;
             will-change: border-radius, transform;
         }
 
@@ -68,7 +113,7 @@
             background: var(--primary);
             top: -10%;
             left: -10%;
-            animation: morph 12s linear infinite alternate, drift 20s infinite alternate ease-in-out;
+            animation: morph 12s linear infinite alternate, drift 22s infinite alternate ease-in-out;
         }
 
         .orb-2 {
@@ -90,22 +135,23 @@
             to { transform: translate(12%, 12%) scale(1.1); }
         }
 
-        /* Glassmorphism Styles */
+        /* Glassmorphism */
         .glass {
             background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border);
-            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05);
-            transition: background 0.4s ease, border-color 0.4s ease;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
         }
 
         .glass-active {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.2);
         }
 
-        /* Kinetic Animations */
+        /* Kinetic Spring Animations */
         @keyframes springIn {
             0% { opacity: 0; transform: translateY(15px) scale(0.98); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -134,17 +180,41 @@
         }
 
         /* Habit States */
-        .habit-card { transition: all 0.3s ease; }
+        .habit-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .habit-card.done { opacity: 0.5; transform: scale(0.98); }
 
         .progress-fill {
-            transition: width 1s cubic-bezier(0.65, 0, 0.35, 1);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 1s cubic-bezier(0.65, 0, 0.35, 1), background 0.8s ease;
+        }
+
+        /* XP Bar Shimmer */
+        .shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .shimmer::after {
+            content: "";
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            animation: shimmerEffect 3s infinite;
+        }
+        @keyframes shimmerEffect { 100% { left: 200%; } }
+
+        /* Mobile Spacing Optimizations */
+        @media (max-width: 768px) {
+            .main-container { padding-left: 1.25rem; padding-right: 1.25rem; padding-top: 1.5rem; }
+            .habit-card { padding: 1.25rem; border-radius: 1.75rem; }
+            .reminder-card { padding: 1.5rem; border-radius: 2rem; }
+            h2 { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body data-theme="dark">
 
-    <!-- Latar Belakang Liquid -->
+    <!-- Morphing Liquid Orbs -->
     <div class="liquid-container">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
@@ -153,20 +223,19 @@
     <div class="flex flex-col md:flex-row h-screen overflow-hidden">
         
         <!-- SIDEBAR DESKTOP -->
-        <aside class="hidden md:flex w-72 flex-col glass m-4 rounded-[2.5rem] p-8 z-50">
-            <div class="mb-10 flex items-center gap-4 px-2">
-                <!-- Logo UPI & HABITrack Proporsional -->
-                <img src="upi.png" 
-                     alt="Logo UPI" class="w-10 h-10 upi-logo object-contain">
-                <div class="h-8 w-[1px] bg-white/10"></div>
+        <aside class="hidden md:flex w-72 flex-col glass m-4 rounded-[3rem] p-8 z-50">
+            <div class="mb-10 flex items-center gap-3 px-2">
+                <!-- Logo UPI Lokal -->
+                <img src="upi.png" alt="Logo UPI" class="w-10 h-10 upi-logo object-contain" onerror="this.src='https://via.placeholder.com/40?text=UPI'">
+                <div class="h-8 w-[1px] bg-white/10 opacity-20"></div>
                 <div>
-                    <h1 class="text-xl font-black italic tracking-tighter leading-none">HABIT<span class="text-indigo-500">rack</span></h1>
-                    <p class="text-[8px] font-bold opacity-30 uppercase tracking-[0.2em] mt-1">Zenith v2.2</p>
+                    <h1 class="text-xl font-black italic tracking-tighter leading-none">HABIT<span class="text-accent" id="desktop-accent">rack</span></h1>
+                    <p class="text-[8px] font-bold opacity-30 uppercase tracking-[0.3em] mt-1">Zenith v3.2</p>
                 </div>
             </div>
             
             <nav class="space-y-3 flex-1">
-                <button onclick="showTab('home')" class="nav-btn w-full flex items-center gap-4 px-5 py-4 rounded-3xl font-bold transition-all bg-white/5 text-indigo-400 press-effect">
+                <button onclick="showTab('home')" class="nav-btn w-full flex items-center gap-4 px-5 py-4 rounded-3xl font-bold transition-all bg-white/5 text-accent press-effect">
                     <i data-lucide="layout-grid" class="w-5 h-5"></i> Dashboard
                 </button>
                 <button onclick="showTab('planner')" class="nav-btn w-full flex items-center gap-4 px-5 py-4 rounded-3xl font-bold opacity-40 hover:opacity-100 press-effect">
@@ -178,38 +247,40 @@
             </nav>
 
             <div class="mt-auto space-y-4">
-                <button onclick="toggleTheme()" class="w-full flex items-center justify-between glass px-5 py-4 rounded-3xl press-effect border-white/5 group">
-                    <span class="text-[10px] font-bold opacity-60 uppercase tracking-widest">Tema</span>
-                    <i data-lucide="sun" id="theme-icon" class="w-4 h-4 opacity-60 group-hover:rotate-45 transition-transform"></i>
+                <button onclick="cycleTheme()" class="w-full flex items-center justify-between glass px-5 py-4 rounded-3xl press-effect border-white/5 group transition-all">
+                    <div class="flex flex-col">
+                        <span class="text-[8px] font-black opacity-30 uppercase">Tema Aktif</span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest" id="theme-text">Midnight</span>
+                    </div>
+                    <i data-lucide="palette" class="w-4 h-4 opacity-60 group-hover:rotate-12 transition-transform"></i>
                 </button>
-                <div class="glass p-5 rounded-[2rem] border-white/5">
-                    <p class="text-[10px] font-medium opacity-40 italic leading-relaxed text-center">
-                        "Teman, bukan pengawas."
+                <div class="glass p-5 rounded-[2.2rem] border-white/5">
+                    <p class="text-[9px] font-medium opacity-40 italic leading-relaxed text-center">
+                        "Perubahan kecil hari ini lebih baik daripada sempurna sekali kali."
                     </p>
                 </div>
             </div>
         </aside>
 
         <!-- AREA KONTEN UTAMA -->
-        <main class="flex-1 overflow-y-auto no-scrollbar relative z-10 px-5 py-6 md:px-10 md:py-12 pb-32">
+        <main class="flex-1 overflow-y-auto no-scrollbar relative z-10 px-5 py-6 md:px-12 md:py-12 pb-32 main-container">
             <div class="max-w-4xl mx-auto space-y-8 md:space-y-10">
                 
-                <!-- HEADER MOBILE: UPI & Logo HABITrack Berdampingan -->
+                <!-- HEADER MOBILE -->
                 <header class="flex justify-between items-center animate-spring">
-                    <div class="flex items-center gap-3">
-                        <img src="https://upload.wikimedia.org/wikipedia/id/thumb/1/15/Logo_UPI.svg/1200px-Logo_UPI.svg.png" 
-                             alt="Logo UPI" class="w-8 h-8 upi-logo object-contain md:hidden">
-                        <div class="h-6 w-[1px] bg-white/10 md:hidden"></div>
+                    <div class="flex items-center gap-2.5">
+                        <img src="1774532838452.png" alt="Logo UPI" class="w-9 h-9 upi-logo object-contain md:hidden" onerror="this.src='https://via.placeholder.com/36?text=UPI'">
+                        <div class="h-6 w-[1px] bg-white/10 md:hidden opacity-20"></div>
                         <div class="md:hidden">
-                            <h1 class="text-lg font-black italic tracking-tighter leading-none">HABIT<span class="text-indigo-500">rack</span></h1>
+                            <h1 class="text-lg font-black italic tracking-tighter leading-none">HABIT<span class="text-accent" id="mobile-accent">rack</span></h1>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="toggleTheme()" class="md:hidden glass w-10 h-10 rounded-xl flex items-center justify-center press-effect">
-                            <i data-lucide="sun" class="w-4 h-4" id="theme-icon-mobile"></i>
+                        <button onclick="cycleTheme()" class="md:hidden glass w-10 h-10 rounded-xl flex items-center justify-center press-effect">
+                            <i data-lucide="palette" class="w-4 h-4 opacity-60"></i>
                         </button>
                         <div class="glass px-4 py-2.5 rounded-2xl border-white/10 flex items-center gap-3 shadow-sm">
-                            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-500">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-accent" id="xp-icon-box">
                                 <i data-lucide="award" class="w-4 h-4"></i>
                             </div>
                             <div class="text-right">
@@ -221,9 +292,9 @@
 
                 <!-- GENTLE REMINDER -->
                 <section class="animate-spring" style="animation-delay: 0.1s;">
-                    <div class="glass p-6 md:p-8 rounded-[2.5rem] md:rounded-[3rem] border-l-4 border-indigo-500 relative overflow-hidden group">
+                    <div class="glass p-6 md:p-8 rounded-[2.2rem] md:rounded-[3.5rem] border-l-4 border-accent relative overflow-hidden group reminder-card">
                         <div class="relative z-10 flex flex-col md:flex-row gap-5 md:gap-8 items-center text-center md:text-left">
-                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-3xl">🌿</div>
+                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-[1.2rem] bg-indigo-500/10 flex items-center justify-center text-3xl" id="reminder-icon-box">🌿</div>
                             <div class="flex-1">
                                 <p id="reminder-msg" class="text-base md:text-xl font-medium leading-relaxed opacity-90 italic">
                                     "Ambil napas sejenak. Kamu tidak harus mengejar semuanya hari ini, langkah kecil sudah cukup."
@@ -242,7 +313,7 @@
                     <div class="flex justify-between items-end animate-spring" style="animation-delay: 0.2s;">
                         <div>
                             <h2 class="text-2xl md:text-3xl font-black tracking-tighter">Micro Habits</h2>
-                            <p class="text-[10px] md:text-xs opacity-40 font-medium tracking-wide">Pilih kebiasaan kecil yang realistis sesuai kondisimu.</p>
+                            <p class="text-[10px] md:text-xs opacity-40 font-medium tracking-wide">Target realistis untuk hari ini.</p>
                         </div>
                         <button onclick="openModal()" class="w-12 h-12 md:w-14 md:h-14 glass rounded-2xl flex items-center justify-center text-2xl shadow-lg press-effect border-white/10">+</button>
                     </div>
@@ -256,19 +327,19 @@
                 <div id="tab-planner" class="tab-content space-y-8">
                     <div class="text-center space-y-2 animate-spring">
                         <h2 class="text-2xl md:text-3xl font-black tracking-tighter">Vibe Check ⚡</h2>
-                        <p class="text-[10px] md:text-xs opacity-40 max-w-xs mx-auto">Atur aktivitas berdasarkan energimu agar terhindar dari burnout.</p>
+                        <p class="text-[10px] md:text-xs opacity-40 max-w-xs mx-auto">Sesuaikan rencana harimu dengan tingkat energimu.</p>
                     </div>
 
                     <div class="flex justify-center gap-3 px-1 animate-spring" style="animation-delay: 0.1s;">
-                        <button onclick="setEnergy('low')" id="e-low" class="energy-btn flex-1 glass py-6 md:py-8 rounded-[2rem] md:rounded-[2.5rem] press-effect transition-all flex flex-col items-center gap-2">
+                        <button onclick="setEnergy('low')" id="e-low" class="energy-btn flex-1 glass py-6 md:py-8 rounded-[1.75rem] md:rounded-[2.5rem] press-effect transition-all flex flex-col items-center gap-2">
                             <span class="text-3xl">☁️</span>
                             <span class="font-bold text-[8px] uppercase tracking-widest opacity-40">Low</span>
                         </button>
-                        <button onclick="setEnergy('med')" id="e-med" class="energy-btn flex-1 glass py-6 md:py-8 rounded-[2rem] md:rounded-[2.5rem] press-effect transition-all flex flex-col items-center gap-2">
+                        <button onclick="setEnergy('med')" id="e-med" class="energy-btn flex-1 glass py-6 md:py-8 rounded-[1.75rem] md:rounded-[2.5rem] press-effect transition-all flex flex-col items-center gap-2">
                             <span class="text-3xl">🔋</span>
                             <span class="font-bold text-[8px] uppercase tracking-widest opacity-40">Med</span>
                         </button>
-                        <button onclick="setEnergy('high')" id="e-high" class="energy-btn flex-1 glass py-6 md:py-8 rounded-[2rem] md:rounded-[2.5rem] press-effect transition-all flex flex-col items-center gap-2">
+                        <button onclick="setEnergy('high')" id="e-high" class="energy-btn flex-1 glass py-6 md:py-8 rounded-[1.75rem] md:rounded-[2.5rem] press-effect transition-all flex flex-col items-center gap-2">
                             <span class="text-3xl">⚡</span>
                             <span class="font-bold text-[8px] uppercase tracking-widest opacity-40">High</span>
                         </button>
@@ -281,40 +352,40 @@
 
                 <!-- TAB: REFLECTION -->
                 <div id="tab-reflection" class="tab-content space-y-8">
-                    <div class="glass p-6 md:p-8 rounded-[2.5rem] md:rounded-[3.5rem] space-y-6 animate-spring">
+                    <div class="glass p-6 md:p-10 rounded-[2.2rem] md:rounded-[4rem] space-y-6 animate-spring">
                         <div class="text-center space-y-3">
-                            <div class="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-3xl mx-auto">🧘</div>
+                            <div class="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-3xl mx-auto" id="reflection-icon-box">🧘</div>
                             <h2 class="text-2xl md:text-3xl font-black tracking-tighter italic leading-none">Daily Reflection</h2>
                             <p class="text-[10px] md:text-xs opacity-40 italic">"Apa satu hal kecil yang berhasil kamu lalui hari ini?"</p>
                         </div>
-                        <textarea id="ref-input" placeholder="Refleksi singkat saja..." class="w-full h-32 md:h-40 bg-white/5 border border-white/10 rounded-[1.5rem] md:rounded-[2rem] p-6 text-sm focus:ring-4 ring-indigo-500/10 outline-none transition-all placeholder:opacity-20 text-current"></textarea>
-                        <button onclick="saveReflection()" class="w-full py-5 rounded-[1.5rem] md:rounded-[2rem] bg-indigo-600 font-black text-base shadow-lg press-effect text-white">Selesaikan Hari Ini</button>
+                        <textarea id="ref-input" placeholder="Tuliskan di sini..." class="w-full h-32 md:h-44 bg-white/5 border border-white/10 rounded-[1.5rem] md:rounded-[2.5rem] p-6 text-sm focus:ring-4 border-accent outline-none transition-all placeholder:opacity-20 text-current"></textarea>
+                        <button onclick="saveReflection()" class="w-full py-5 rounded-[1.5rem] md:rounded-[2.5rem] bg-accent font-black text-base shadow-lg press-effect text-white">Simpan Refleksi</button>
                     </div>
                     <div id="ref-history" class="space-y-3">
                         <!-- Riwayat singkat -->
                     </div>
                 </div>
 
-                <!-- PROGRESS MINGGUAN -->
+                <!-- PROGRESS TANPA TEKANAN -->
                 <div class="animate-spring" style="animation-delay: 0.4s;">
-                    <div class="glass p-6 rounded-[2.5rem] border-white/5 relative overflow-hidden">
+                    <div class="glass p-6 rounded-[2.2rem] md:rounded-[3rem] border-white/5 relative overflow-hidden">
                         <div class="flex justify-between items-center mb-4 px-1">
                             <p class="text-[8px] font-black uppercase tracking-widest opacity-30">Sustainability Progress</p>
                             <span id="streak-display" class="text-[9px] font-bold opacity-50 italic">Fokus pada keberlanjutan ✨</span>
                         </div>
-                        <div class="h-2.5 w-full bg-black/20 rounded-full p-[2px] border border-white/5 overflow-hidden">
-                            <div id="xp-bar" class="progress-fill h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" style="width: 60%"></div>
+                        <div class="h-2.5 w-full bg-black/20 rounded-full p-[2px] border border-white/5 overflow-hidden shimmer">
+                            <div id="xp-bar" class="progress-fill h-full rounded-full" style="width: 60%"></div>
                         </div>
-                        <p class="text-[8px] opacity-20 text-center mt-3 font-medium tracking-tight">Tidak ada penalti jika hari ini kamu beristirahat.</p>
+                        <p class="text-[8px] opacity-20 text-center mt-3 font-medium tracking-tight">Tidak ada hukuman jika melewatkan hari. Esok adalah hari baru.</p>
                     </div>
                 </div>
 
             </div>
         </main>
 
-        <!-- NAV MOBILE -->
+        <!-- BOTTOM NAV MOBILE -->
         <nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[88%] z-[100] glass rounded-[2.5rem] p-2 border-white/10 shadow-2xl flex justify-around items-center backdrop-blur-3xl">
-            <button onclick="showTab('home')" class="mobile-nav p-4 rounded-2xl text-indigo-400 bg-white/5 press-effect">
+            <button onclick="showTab('home')" class="mobile-nav p-4 rounded-2xl text-accent bg-white/5 press-effect">
                 <i data-lucide="layout-grid" class="w-5 h-5"></i>
             </button>
             <button onclick="showTab('planner')" class="mobile-nav p-4 rounded-2xl opacity-30 press-effect">
@@ -329,11 +400,11 @@
     <!-- MODAL -->
     <div id="modal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6 bg-black/90 backdrop-blur-xl transition-all duration-500">
         <div class="glass w-full max-w-lg p-8 md:p-10 rounded-[2.5rem] md:rounded-[3.5rem] border-white/20 animate-spring">
-            <h2 class="text-2xl md:text-3xl font-black mb-8 italic tracking-tighter">Micro Habit Baru 🎯</h2>
+            <h2 class="text-2xl md:text-3xl font-black mb-8 italic tracking-tighter">Target Kecil 🎯</h2>
             <div class="space-y-6">
                 <div>
-                    <label class="text-[9px] font-black uppercase opacity-30 tracking-widest ml-4 mb-2 block">Apa langkah kecilmu?</label>
-                    <input id="h-input" type="text" placeholder="Misal: Jalan 5 Menit" class="w-full bg-white/5 border border-white/10 rounded-[1.5rem] p-6 text-base font-bold outline-none focus:ring-4 ring-indigo-500/10 transition-all text-current">
+                    <label class="text-[9px] font-black uppercase opacity-30 tracking-widest ml-4 mb-2 block">Apa langkah kecilmu hari ini?</label>
+                    <input id="h-input" type="text" placeholder="Misal: Jalan 5 Menit" class="w-full bg-white/5 border border-white/10 rounded-[1.5rem] p-6 text-base font-bold outline-none focus:ring-4 border-accent transition-all text-current">
                 </div>
                 <div class="flex gap-2.5 overflow-x-auto no-scrollbar py-1">
                     <button onclick="setInp('🏃 Jalan 5 Menit')" class="px-5 py-2 glass rounded-full text-[9px] font-bold whitespace-nowrap hover:bg-white/10 opacity-60">🏃 Jalan</button>
@@ -342,28 +413,36 @@
                 </div>
             </div>
             <div class="flex gap-4 mt-10">
-                <button onclick="closeModal()" class="flex-1 py-5 rounded-2xl font-bold opacity-30">Batal</button>
-                <button onclick="addHabit()" class="flex-[2] py-5 rounded-2xl bg-indigo-600 text-white font-black text-lg shadow-lg">Mulai Kecil</button>
+                <button onclick="closeModal()" class="flex-1 py-5 rounded-2xl md:rounded-3xl font-bold opacity-30 hover:opacity-100 transition-all">Batal</button>
+                <button onclick="addHabit()" class="flex-[2] py-5 rounded-2xl md:rounded-3xl bg-accent text-white font-black text-lg shadow-lg">Mulai Kecil</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- State ---
-        let habits = JSON.parse(localStorage.getItem('ht_final_upi_habits')) || [
+        // --- State Management ---
+        let habits = JSON.parse(localStorage.getItem('ht_v32_habits')) || [
             { id: 1, name: 'Jalan santai 5 menit', done: false, streak: 4 },
-            { id: 2, name: 'Minum air putih saat bangun', done: true, streak: 12 }
+            { id: 2, name: 'Tidur 15 menit lebih awal', done: true, streak: 12 }
         ];
-        let xp = parseInt(localStorage.getItem('ht_final_upi_xp')) || 1250;
-        let reflections = JSON.parse(localStorage.getItem('ht_final_upi_refs')) || [];
-        let isDarkMode = true;
+        let xp = parseInt(localStorage.getItem('ht_v32_xp')) || 1250;
+        let reflections = JSON.parse(localStorage.getItem('ht_v32_refs')) || [];
+        
+        const themes = [
+            { id: 'dark', name: 'Midnight' },
+            { id: 'light', name: 'Zenith' },
+            { id: 'nature', name: 'Nature' },
+            { id: 'ocean', name: 'Ocean' },
+            { id: 'sunset', name: 'Sunset' }
+        ];
+        let currentThemeIndex = 0;
 
         const GENTLE_MESSAGES = [
-            "Ambil napas sejenak. Tidak harus mengejar semuanya hari ini. ✨",
+            "Ambil napas sejenak. Kamu tidak harus mengejar semuanya hari ini. ✨",
             "Selesaikan satu hal kecil, lalu istirahatlah. Kamu hebat. 🔋",
             "Kemajuan sekecil apapun tetaplah kemajuan. 🤍",
             "Tidak apa-apa jika harimu terasa lambat hari ini. 🌿",
-            "Fokuslah pada saat ini, lupakan beban hari esok. 🌊"
+            "Fokuslah pada saat ini, lupakan beban esok. 🌊"
         ];
 
         const ENERGY_TASKS = {
@@ -372,20 +451,23 @@
             high: ["Olahraga intens 20 menit", "Kerjakan tugas paling sulit", "Deep work 1 jam"]
         };
 
-        // --- Logic ---
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-            const icon = isDarkMode ? 'sun' : 'moon';
-            document.getElementById('theme-icon').setAttribute('data-lucide', icon);
-            document.getElementById('theme-icon-mobile').setAttribute('data-lucide', icon);
+        // --- Theme Engine ---
+        function cycleTheme() {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            const theme = themes[currentThemeIndex];
+            document.body.setAttribute('data-theme', theme.id);
+            document.getElementById('theme-text').innerText = theme.name;
+            
+            // Re-render components that rely on theme accent
+            renderHabits();
             lucide.createIcons();
         }
 
+        // --- Core Logic ---
         function save() {
-            localStorage.setItem('ht_final_upi_habits', JSON.stringify(habits));
-            localStorage.setItem('ht_final_upi_xp', xp.toString());
-            localStorage.setItem('ht_final_upi_refs', JSON.stringify(reflections));
+            localStorage.setItem('ht_v32_habits', JSON.stringify(habits));
+            localStorage.setItem('ht_v32_xp', xp.toString());
+            localStorage.setItem('ht_v32_refs', JSON.stringify(reflections));
         }
 
         function renderHabits() {
@@ -393,15 +475,15 @@
             container.innerHTML = '';
             habits.forEach((h) => {
                 const card = document.createElement('div');
-                card.className = `habit-card glass p-5 rounded-[2rem] flex items-center justify-between transition-all group ${h.done ? 'done' : ''} press-effect`;
+                card.className = `habit-card glass p-5 md:p-6 rounded-[2rem] flex items-center justify-between transition-all group ${h.done ? 'done' : ''} press-effect`;
                 card.innerHTML = `
                     <div class="flex items-center gap-4">
-                        <div onclick="toggleHabit(${h.id})" class="w-11 h-11 rounded-xl border-2 flex items-center justify-center transition-all ${h.done ? 'bg-indigo-600 border-indigo-600 shadow-lg' : 'border-current opacity-20'}">
+                        <div onclick="toggleHabit(${h.id})" class="w-11 h-11 rounded-xl border-2 flex items-center justify-center transition-all ${h.done ? 'bg-accent border-accent shadow-lg' : 'border-current opacity-20'}">
                             ${h.done ? '<i data-lucide="check" class="text-white w-5 h-5"></i>' : ''}
                         </div>
                         <div>
-                            <h3 class="font-bold text-sm leading-tight tracking-tight">${h.name}</h3>
-                            <p class="text-[8px] font-black uppercase opacity-20 tracking-widest mt-0.5">${h.streak} Day Streak</p>
+                            <h3 class="font-bold text-sm md:text-base leading-tight tracking-tight">${h.name}</h3>
+                            <p class="text-[8px] font-black uppercase opacity-20 tracking-widest mt-0.5">${h.streak} Hari Bertahan</p>
                         </div>
                     </div>
                     <button onclick="deleteHabit(${h.id})" class="opacity-0 group-hover:opacity-100 p-2 text-xs opacity-20 hover:opacity-100 transition-opacity">
@@ -420,6 +502,7 @@
             if(h.done) {
                 h.streak++;
                 xp += 50;
+                createSuccessFlash();
             } else {
                 h.streak--;
             }
@@ -436,14 +519,16 @@
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + id).classList.add('active');
+
             document.querySelectorAll('.nav-btn, .mobile-nav').forEach(n => {
-                n.classList.remove('text-indigo-400', 'bg-white/5', 'opacity-100');
+                n.classList.remove('text-accent', 'bg-white/5', 'opacity-100');
                 n.classList.add('opacity-30');
             });
+            
             const activeNav = Array.from(document.querySelectorAll('.mobile-nav')).find(n => n.getAttribute('onclick').includes(id));
             if(activeNav) {
                 activeNav.classList.remove('opacity-30');
-                activeNav.classList.add('text-indigo-400', 'bg-white/5', 'opacity-100');
+                activeNav.classList.add('text-accent', 'bg-white/5', 'opacity-100');
             }
             if(id === 'reflection') renderReflections();
         }
@@ -456,7 +541,7 @@
             list.innerHTML = '';
             ENERGY_TASKS[level].forEach((task, i) => {
                 const div = document.createElement('div');
-                div.className = 'glass p-5 rounded-[1.5rem] border-l-4 border-indigo-500 animate-spring';
+                div.className = 'glass p-5 rounded-[1.5rem] border-l-4 border-accent animate-spring';
                 div.style.animationDelay = (i * 0.1) + 's';
                 div.innerHTML = `<p class="font-bold text-sm opacity-80">${task}</p>`;
                 list.appendChild(div);
@@ -476,7 +561,7 @@
 
         function renderReflections() {
             const container = document.getElementById('ref-history');
-            container.innerHTML = '<h4 class="text-[8px] font-black uppercase tracking-[0.3em] opacity-20 mt-8 mb-4 text-center">History Kecil</h4>';
+            container.innerHTML = '<h4 class="text-[8px] font-black uppercase tracking-[0.3em] opacity-20 mt-8 mb-4 text-center">Riwayat Kecil</h4>';
             reflections.slice(0, 2).forEach(r => {
                 const div = document.createElement('div');
                 div.className = 'glass p-5 rounded-[1.8rem] opacity-40 text-xs italic text-center';
@@ -494,6 +579,14 @@
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 500);
             }, 2000);
+        }
+
+        function createSuccessFlash() {
+            const flash = document.createElement('div');
+            flash.className = 'fixed inset-0 pointer-events-none z-[250] bg-white opacity-0 transition-opacity duration-300';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.style.opacity = '0.05', 0);
+            setTimeout(() => { flash.style.opacity = '0'; setTimeout(() => flash.remove(), 300); }, 300);
         }
 
         function openModal() { document.getElementById('modal').classList.replace('hidden', 'flex'); }
