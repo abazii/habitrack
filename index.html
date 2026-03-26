@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HABITrack - Compact Zen</title>
+    <title>HABITrack - Pro v4.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -16,7 +16,7 @@
             --secondary: #ec4899;
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --orb-opacity: 0.2;
+            --orb-opacity: 0.22;
         }
 
         [data-theme="light"] {
@@ -24,9 +24,29 @@
             --text-main: #0f172a;
             --primary: #4f46e5;
             --secondary: #db2777;
-            --glass: rgba(255, 255, 255, 0.8);
-            --glass-border: rgba(0, 0, 0, 0.08);
+            --glass: rgba(0, 0, 0, 0.02);
+            --glass-border: rgba(0, 0, 0, 0.06);
             --orb-opacity: 0.1;
+        }
+
+        [data-theme="garnet"] {
+            --bg: #2d0606;
+            --text-main: #fef2f2;
+            --primary: #ef4444;
+            --secondary: #fca5a5;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(239, 68, 68, 0.2);
+            --orb-opacity: 0.25;
+        }
+
+        [data-theme="ocean"] {
+            --bg: #082f49;
+            --text-main: #f0f9ff;
+            --primary: #0ea5e9;
+            --secondary: #2dd4bf;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(14, 165, 233, 0.15);
+            --orb-opacity: 0.22;
         }
 
         [data-theme="nature"] {
@@ -39,46 +59,26 @@
             --orb-opacity: 0.25;
         }
 
-        [data-theme="ocean"] {
-            --bg: #082f49;
-            --text-main: #f0f9ff;
-            --primary: #0ea5e9;
-            --secondary: #2dd4bf;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(14, 165, 233, 0.2);
-            --orb-opacity: 0.2;
-        }
-
-        [data-theme="sunset"] {
-            --bg: #450a0a;
-            --text-main: #fff7ed;
-            --primary: #f43f5e;
-            --secondary: #fb923c;
-            --glass: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(244, 63, 94, 0.2);
-            --orb-opacity: 0.25;
-        }
-
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg);
             color: var(--text-main);
             overflow: hidden;
-            transition: background-color 0.5s ease;
             -webkit-tap-highlight-color: transparent;
+            contain: content;
         }
 
         .text-accent { color: var(--primary); }
         .bg-accent { background-color: var(--primary); }
         .border-accent { border-color: var(--primary); }
 
-        /* Liquid Background */
+        /* Liquid Background Effects */
         .liquid-container {
             position: fixed;
             inset: 0;
             z-index: -1;
-            overflow: hidden;
             pointer-events: none;
+            will-change: transform;
         }
 
         .orb {
@@ -90,62 +90,84 @@
             transition: background-color 1.2s ease;
         }
 
-        .orb-1 { background: var(--primary); top: -20%; left: -20%; animation: morph 20s infinite alternate; }
-        .orb-2 { background: var(--secondary); bottom: -20%; right: -20%; animation: morph 15s infinite alternate-reverse; }
+        .orb-1 { background: var(--primary); top: -20%; left: -20%; animation: morph 22s infinite alternate linear; }
+        .orb-2 { background: var(--secondary); bottom: -20%; right: -20%; animation: morph 18s infinite alternate-reverse linear; }
 
         @keyframes morph {
-            0% { border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%; transform: rotate(0deg); }
-            100% { border-radius: 60% 40% 40% 60% / 60% 60% 40% 40%; transform: rotate(180deg); }
+            0% { border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%; transform: translate(0,0); }
+            100% { border-radius: 60% 40% 40% 60% / 60% 60% 40% 40%; transform: translate(3%, 3%); }
         }
 
         .glass {
             background: var(--glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--glass-border);
         }
 
-        /* Header Minimize Logic */
+        /* Anti-Jitter Header System */
         .header-sticky {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), background-color 0.3s ease, border-color 0.3s ease;
+            transform-origin: top;
+            will-change: transform, background-color;
         }
 
         .header-sticky.minimized {
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
+            transform: translateY(-5px) scale(0.96);
             background: var(--bg);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             border-bottom: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2);
         }
 
-        .header-sticky.minimized .logo-img { height: 1.5rem; width: 1.5rem; }
-        .header-sticky.minimized h1 { font-size: 1rem; }
-
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeInUp 0.4s ease forwards; }
+        .tab-content.active { display: block; animation: smoothIn 0.35s ease-out; }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes smoothIn {
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .habit-card { transition: all 0.2s ease; }
-        .habit-card:active { transform: scale(0.97); }
-        .habit-card.done { opacity: 0.5; filter: grayscale(0.7); }
+        /* Card Stylings */
+        .habit-card { 
+            transition: transform 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
+        }
+        .habit-card:active { transform: scale(0.98); }
+        .habit-card.done { opacity: 0.5; filter: grayscale(0.5); }
+
+        .delete-btn {
+            opacity: 0.4;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .delete-btn:hover { opacity: 1; transform: scale(1.1); }
+        .delete-btn:active { transform: scale(0.9); }
+
+        /* Energy Planner Highlight */
+        .energy-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.4;
+        }
+        .energy-btn.active-energy {
+            opacity: 1;
+            border: 2px solid var(--primary);
+            background: rgba(var(--primary), 0.1);
+            box-shadow: 0 0 25px -10px var(--primary);
+            transform: translateY(-2px);
+        }
 
         .progress-fill {
             background: linear-gradient(90deg, var(--primary), var(--secondary));
-            transition: width 1s cubic-bezier(0.65, 0, 0.35, 1);
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Mobile Specific Overrides */
-        @media (max-width: 640px) {
-            .section-spacing { margin-bottom: 1.5rem; }
-            .card-padding { padding: 1rem; }
-            h2 { font-size: 1.5rem !important; }
-            .habit-card { border-radius: 1.25rem; }
+        /* Toast Animation */
+        .toast-animate {
+            animation: toastSlide 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes toastSlide {
+            from { transform: translate(-50%, -20px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
         }
     </style>
 </head>
@@ -160,43 +182,43 @@
         
         <!-- SIDEBAR (DESKTOP) -->
         <aside class="hidden md:flex w-72 flex-col glass m-6 rounded-[2.5rem] p-8 z-50">
-            <div class="mb-10 flex items-center gap-3">
-                <img src="1774532838452.png" alt="Logo UPI" class="h-8 w-8 object-contain">
-                <h1 class="text-xl font-black italic tracking-tighter">HABIT<span class="text-accent">rack</span></h1>
+            <div class="mb-12 flex items-center gap-4">
+                <img src="1774532838452.png" alt="Logo UPI" class="h-10 w-10 object-contain">
+                <div>
+                    <h1 class="text-xl font-black italic tracking-tighter leading-none">HABIT<span class="text-accent">rack</span></h1>
+                    <p class="text-[7px] font-bold opacity-30 uppercase tracking-[0.4em] mt-1.5">Version 4.1 Pro</p>
+                </div>
             </div>
             
-            <div onclick="toggleThemePicker()" class="glass rounded-3xl p-4 border-white/10 mb-8 cursor-pointer hover:bg-white/5 transition-all">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[8px] font-black opacity-40 uppercase tracking-widest">Status Progres</span>
-                    <i data-lucide="chevron-right" class="w-3 h-3 opacity-30"></i>
-                </div>
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-8 h-8 rounded-lg bg-accent/20 flex items-center justify-center text-accent">
-                        <i data-lucide="award" class="w-4 h-4"></i>
+            <!-- Global Status Card -->
+            <div onclick="toggleThemePicker()" class="glass rounded-[2rem] p-5 border-white/10 mb-10 cursor-pointer hover:bg-white/10 transition-all group">
+                <div class="flex items-center gap-4 mb-5">
+                    <div class="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent">
+                        <i data-lucide="award" class="w-6 h-6"></i>
                     </div>
                     <div>
-                        <p class="text-[7px] font-black opacity-30 uppercase">Lvl <span class="level-val">1</span></p>
-                        <p class="xp-val font-bold text-xs text-accent">0 XP</p>
+                        <p class="text-[8px] font-black opacity-40 uppercase tracking-widest">Level <span class="level-val">1</span></p>
+                        <p class="xp-val font-bold text-base text-accent leading-none">0 XP</p>
                     </div>
                 </div>
-                <div class="h-1 w-full bg-black/20 rounded-full overflow-hidden">
-                    <div class="xp-bar-main h-full bg-accent rounded-full transition-all duration-700" style="width: 0%"></div>
+                <div class="h-1.5 w-full bg-black/20 rounded-full overflow-hidden mb-4">
+                    <div class="xp-bar-main h-full bg-accent rounded-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
-                <div class="mt-3 pt-3 border-t border-white/5 flex items-center justify-between opacity-50">
-                    <span id="theme-name-desktop" class="text-[8px] font-bold uppercase tracking-widest">Midnight</span>
-                    <i data-lucide="palette" class="w-3 h-3"></i>
+                <div class="flex justify-between items-center opacity-40 text-[9px] font-black uppercase tracking-[0.2em]">
+                    <span id="theme-name-desktop">Midnight</span>
+                    <i data-lucide="palette" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
                 </div>
             </div>
 
             <nav class="space-y-2 flex-1">
-                <button onclick="showTab('home')" id="nav-home" class="nav-btn w-full flex items-center gap-4 px-5 py-3 rounded-2xl font-bold transition-all text-accent bg-white/5">
-                    <i data-lucide="layout-grid" class="w-4 h-4"></i> Dashboard
+                <button onclick="showTab('home')" id="nav-home" class="nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-accent bg-white/5">
+                    <i data-lucide="layout-grid" class="w-5 h-5"></i> Dashboard
                 </button>
-                <button onclick="showTab('planner')" id="nav-planner" class="nav-btn w-full flex items-center gap-4 px-5 py-3 rounded-2xl font-bold opacity-30 hover:opacity-100 transition-all">
-                    <i data-lucide="zap" class="w-4 h-4"></i> Planner
+                <button onclick="showTab('planner')" id="nav-planner" class="nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold opacity-30 hover:opacity-100 transition-all">
+                    <i data-lucide="zap" class="w-5 h-5"></i> Planner
                 </button>
-                <button onclick="showTab('reflection')" id="nav-reflection" class="nav-btn w-full flex items-center gap-4 px-5 py-3 rounded-2xl font-bold opacity-30 hover:opacity-100 transition-all">
-                    <i data-lucide="leaf" class="w-4 h-4"></i> Refleksi
+                <button onclick="showTab('reflection')" id="nav-reflection" class="nav-btn w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold opacity-30 hover:opacity-100 transition-all">
+                    <i data-lucide="leaf" class="w-5 h-5"></i> Refleksi
                 </button>
             </nav>
         </aside>
@@ -204,211 +226,242 @@
         <!-- MAIN VIEWPORT -->
         <div id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar relative z-10 scroll-smooth">
             
-            <!-- STICKY HEADER -->
-            <header id="header" class="header-sticky sticky top-0 z-[100] px-4 py-4 md:px-12 md:py-8 flex justify-between items-center bg-transparent">
-                <div class="flex items-center gap-2">
-                    <img src="1774532838452.png" alt="Logo UPI" class="logo-img h-8 w-8 object-contain transition-all">
-                    <h1 class="text-lg md:text-2xl font-black italic tracking-tighter">HABIT<span class="text-accent">rack</span></h1>
+            <!-- FIXED HEADER -->
+            <header id="header" class="header-sticky sticky top-0 z-[100] px-5 py-5 md:px-12 md:py-10 flex justify-between items-center bg-transparent">
+                <div class="flex items-center gap-3">
+                    <img src="1774532838452.png" alt="Logo UPI" class="h-9 w-9 object-contain">
+                    <h1 class="text-xl md:text-3xl font-black italic tracking-tighter">HABIT<span class="text-accent">rack</span></h1>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <!-- Compact Status Pill (Mobile) -->
-                    <div onclick="toggleThemePicker()" class="md:hidden glass px-3 py-1.5 rounded-full border-white/10 flex items-center gap-2 active:scale-95 transition-all">
+                    <!-- Status Tablet/Mobile -->
+                    <div onclick="toggleThemePicker()" class="md:hidden glass px-4 py-2 rounded-2xl border-white/10 flex items-center gap-3 active:scale-95 transition-all">
                         <div class="text-right">
-                            <span class="text-[6px] font-black opacity-40 uppercase block leading-none">Lvl <span class="level-val">1</span></span>
-                            <span class="xp-val font-bold text-[10px] text-accent leading-none">0 XP</span>
+                            <span class="text-[7px] font-black opacity-30 uppercase block leading-none mb-0.5">Lvl <span class="level-val">1</span></span>
+                            <span class="xp-val font-bold text-xs text-accent leading-none">0 XP</span>
                         </div>
-                        <div class="w-5 h-5 rounded-md bg-accent/20 flex items-center justify-center text-accent">
-                            <i data-lucide="palette" class="w-3 h-3"></i>
+                        <div class="w-7 h-7 rounded-lg bg-accent/20 flex items-center justify-center text-accent">
+                            <i data-lucide="palette" class="w-4 h-4"></i>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <!-- CONTENT WRAPPER -->
-            <div class="max-w-4xl mx-auto px-4 md:px-12 pb-32 space-y-6 md:space-y-10">
+            <!-- CONTENT -->
+            <div class="max-w-4xl mx-auto px-5 md:px-12 pb-40 space-y-8 md:space-y-16">
                 
-                <!-- GREETING SECTION -->
-                <section class="animate-in fade-in slide-in-from-bottom-2 duration-500">
-                    <div class="mb-4">
-                        <h2 id="greeting" class="text-2xl md:text-5xl font-black tracking-tight italic">Halo, Pejuang!</h2>
-                        <p id="date-display" class="text-[8px] md:text-xs font-bold opacity-30 uppercase tracking-widest mt-1">Kamis, 24 Oktober</p>
+                <!-- GREETING -->
+                <section class="animate-in fade-in duration-700">
+                    <div class="mb-6 pt-2">
+                        <h2 id="greeting" class="text-4xl md:text-7xl font-black tracking-tighter italic leading-none">Halo, Pejuang!</h2>
+                        <div class="flex items-center gap-2 mt-4 opacity-30">
+                            <i data-lucide="calendar" class="w-4 h-4"></i>
+                            <p id="date-display" class="text-[10px] md:text-xs font-bold uppercase tracking-[0.3em]">Kamis, 24 Oktober</p>
+                        </div>
                     </div>
 
-                    <div class="glass p-5 md:p-8 rounded-[1.75rem] md:rounded-[3rem] border-l-[6px] border-accent relative overflow-hidden">
-                        <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 md:w-16 md:h-16 rounded-xl bg-accent/10 flex items-center justify-center text-2xl md:text-4xl">🌿</div>
-                            <p id="reminder-msg" class="text-xs md:text-xl font-semibold opacity-90 italic flex-1">
-                                "Langkah kecil hari ini adalah awal kemenangan esok."
-                            </p>
+                    <div class="glass p-6 md:p-12 rounded-[2.5rem] md:rounded-[4rem] border-l-[10px] border-accent relative overflow-hidden shadow-2xl">
+                        <div class="flex flex-col md:flex-row gap-8 items-center text-center md:text-left">
+                            <div class="w-16 h-16 md:w-24 md:h-24 rounded-[2rem] bg-accent/10 flex items-center justify-center text-4xl md:text-6xl" id="reminder-emoji">🌿</div>
+                            <div class="flex-1">
+                                <p id="reminder-msg" class="text-lg md:text-3xl font-bold opacity-90 italic leading-relaxed">
+                                    "Langkah kecil hari ini adalah awal kemenangan esok."
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </section>
 
                 <!-- TAB: HOME -->
-                <div id="tab-home" class="tab-content active space-y-4">
-                    <div class="flex justify-between items-end px-1">
+                <div id="tab-home" class="tab-content active space-y-6">
+                    <div class="flex justify-between items-end px-2">
                         <div>
-                            <h3 class="text-sm md:text-xl font-black italic uppercase opacity-40 tracking-widest">Micro Habits</h3>
+                            <h3 class="text-sm md:text-xl font-black italic uppercase opacity-40 tracking-[0.2em]">Micro Habits</h3>
+                            <p class="text-[10px] opacity-30 font-bold mt-1 uppercase">Selesaikan satu persatu</p>
                         </div>
-                        <button onclick="openModal()" class="w-10 h-10 md:w-14 md:h-14 bg-accent rounded-xl md:rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg active:scale-90 transition-all">+</button>
+                        <button onclick="openModal()" class="w-14 h-14 md:w-20 md:h-20 bg-accent rounded-[1.8rem] md:rounded-[2.5rem] flex items-center justify-center text-white text-4xl shadow-xl active:scale-90 hover:scale-105 transition-all">+</button>
                     </div>
-                    <div id="habit-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <!-- Habits -->
+                    <div id="habit-list" class="flex flex-col gap-3 md:gap-4">
+                        <!-- 1-Column Habits -->
                     </div>
                 </div>
 
                 <!-- TAB: PLANNER -->
-                <div id="tab-planner" class="tab-content space-y-6">
-                    <div class="text-center space-y-1">
-                        <h3 class="text-sm font-black italic opacity-40 tracking-widest">Vibe Check ⚡</h3>
+                <div id="tab-planner" class="tab-content space-y-10">
+                    <div class="text-center space-y-2">
+                        <h3 class="text-2xl md:text-4xl font-black italic uppercase tracking-tighter">Vibe Check ⚡</h3>
+                        <p class="text-xs md:text-sm opacity-40 font-medium italic">Sesuaikan ambisi dengan energi hari ini.</p>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="setEnergy('low')" id="e-low" class="energy-btn flex-1 glass py-4 rounded-2xl flex flex-col items-center gap-1 active:scale-95 transition-all">
-                            <span class="text-xl">☁️</span>
-                            <span class="text-[7px] font-black uppercase opacity-40">Low</span>
+                    <div class="flex gap-4">
+                        <button onclick="setEnergy('low')" id="e-low" class="energy-btn flex-1 glass py-10 rounded-[2.5rem] flex flex-col items-center gap-3">
+                            <span class="text-4xl">☁️</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest">Low</span>
                         </button>
-                        <button onclick="setEnergy('med')" id="e-med" class="energy-btn flex-1 glass py-4 rounded-2xl flex flex-col items-center gap-1 border-accent bg-accent/5">
-                            <span class="text-xl">🔋</span>
-                            <span class="text-[7px] font-black uppercase opacity-40">Mid</span>
+                        <button onclick="setEnergy('med')" id="e-med" class="energy-btn flex-1 glass py-10 rounded-[2.5rem] flex flex-col items-center gap-3">
+                            <span class="text-4xl">🔋</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest">Mid</span>
                         </button>
-                        <button onclick="setEnergy('high')" id="e-high" class="energy-btn flex-1 glass py-4 rounded-2xl flex flex-col items-center gap-1 active:scale-95 transition-all">
-                            <span class="text-xl">⚡</span>
-                            <span class="text-[7px] font-black uppercase opacity-40">High</span>
+                        <button onclick="setEnergy('high')" id="e-high" class="energy-btn flex-1 glass py-10 rounded-[2.5rem] flex flex-col items-center gap-3">
+                            <span class="text-4xl">⚡</span>
+                            <span class="text-[10px] font-black uppercase tracking-widest">High</span>
                         </button>
                     </div>
-                    <div id="planner-tasks" class="grid grid-cols-1 gap-2"></div>
+                    <div id="planner-tasks" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
                 </div>
 
                 <!-- TAB: REFLECTION -->
-                <div id="tab-reflection" class="tab-content space-y-6">
-                    <div class="glass p-6 rounded-[2rem] space-y-4">
-                        <div class="text-center">
-                            <h3 class="text-base font-black italic tracking-tight">Momen Refleksi</h3>
-                            <p class="text-[9px] opacity-40 italic mt-1">Satu hal yang membuatmu bangga hari ini?</p>
+                <div id="tab-reflection" class="tab-content space-y-10">
+                    <div class="glass p-10 md:p-16 rounded-[4rem] space-y-10 text-center shadow-2xl">
+                        <div class="space-y-4">
+                            <div class="w-20 h-20 bg-accent/10 rounded-[2.2rem] flex items-center justify-center text-5xl mx-auto mb-4">🧘</div>
+                            <h3 class="text-3xl md:text-5xl font-black italic tracking-tighter">Momen Refleksi</h3>
+                            <p class="text-sm opacity-40 italic">"Apa satu hal kecil yang berjalan baik hari ini?"</p>
                         </div>
-                        <textarea id="ref-input" placeholder="Tuliskan di sini..." class="w-full h-24 bg-white/5 border border-white/10 rounded-xl p-4 text-xs outline-none focus:ring-1 focus:ring-accent transition-all resize-none"></textarea>
-                        <button onclick="saveReflection()" class="w-full py-3 rounded-xl bg-accent text-white font-black text-xs shadow-lg">Simpan Refleksi</button>
+                        <textarea id="ref-input" placeholder="Tuangkan pikiranmu di sini..." class="w-full h-40 bg-white/5 border border-white/10 rounded-[2rem] p-8 text-base outline-none focus:ring-4 focus:ring-accent/20 transition-all resize-none text-current"></textarea>
+                        <button onclick="saveReflection()" class="w-full py-7 rounded-[2.2rem] bg-accent text-white font-black text-xl shadow-xl active:scale-95 hover:brightness-110 transition-all">Simpan Refleksi</button>
                     </div>
-                    <div id="ref-history" class="space-y-2"></div>
+                    <div id="ref-history" class="space-y-4"></div>
                 </div>
 
             </div>
         </div>
 
-        <!-- MOBILE BOTTOM NAV -->
-        <nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[80%] z-[150] glass rounded-[1.75rem] p-1.5 border-white/10 shadow-2xl flex justify-around backdrop-blur-3xl">
-            <button onclick="showTab('home')" class="mobile-nav p-3 rounded-xl text-accent bg-white/5 transition-all">
-                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+        <!-- MOBILE NAV -->
+        <nav class="md:hidden fixed bottom-8 left-1/2 -translate-x-1/2 w-[88%] z-[150] glass rounded-[2.5rem] p-2 border-white/10 shadow-2xl flex justify-around backdrop-blur-3xl">
+            <button onclick="showTab('home')" class="mobile-nav p-5 rounded-2xl text-accent bg-white/5 transition-all">
+                <i data-lucide="layout-grid" class="w-6 h-6"></i>
             </button>
-            <button onclick="showTab('planner')" class="mobile-nav p-3 rounded-xl opacity-20 transition-all">
-                <i data-lucide="zap" class="w-5 h-5"></i>
+            <button onclick="showTab('planner')" class="mobile-nav p-5 rounded-2xl opacity-20 transition-all">
+                <i data-lucide="zap" class="w-6 h-6"></i>
             </button>
-            <button onclick="showTab('reflection')" class="mobile-nav p-3 rounded-xl opacity-20 transition-all">
-                <i data-lucide="leaf" class="w-5 h-5"></i>
+            <button onclick="showTab('reflection')" class="mobile-nav p-5 rounded-2xl opacity-20 transition-all">
+                <i data-lucide="leaf" class="w-6 h-6"></i>
             </button>
         </nav>
     </div>
 
     <!-- THEME PICKER -->
-    <div id="theme-picker" class="fixed inset-0 z-[500] hidden items-end md:items-center justify-center p-4 bg-black/60 backdrop-blur-xl opacity-0 transition-opacity">
-        <div class="glass w-full max-w-xs p-6 rounded-[2.5rem] transform translate-y-10 transition-transform">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-black italic text-lg tracking-tight">Tema & Status</h3>
-                <button onclick="toggleThemePicker()" class="p-1 opacity-20 hover:opacity-100"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <div id="theme-picker" class="fixed inset-0 z-[500] hidden items-end md:items-center justify-center p-6 bg-black/75 backdrop-blur-2xl opacity-0 transition-opacity duration-300">
+        <div class="glass w-full max-w-sm p-10 rounded-[3.5rem] transform translate-y-16 transition-transform duration-500">
+            <div class="flex justify-between items-center mb-10">
+                <h3 class="font-black italic text-2xl tracking-tighter">Personalisasi 🎨</h3>
+                <button onclick="toggleThemePicker()" class="p-2 opacity-30 hover:opacity-100"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
             
-            <div class="grid grid-cols-1 gap-2 mb-6">
-                <button onclick="setTheme(0)" class="p-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/5">
-                    <span class="text-xs font-bold">Midnight</span>
-                    <div class="w-3 h-3 rounded-full bg-indigo-500"></div>
-                </button>
-                <button onclick="setTheme(1)" class="p-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/5">
-                    <span class="text-xs font-bold">Zenith</span>
-                    <div class="w-3 h-3 rounded-full bg-blue-400"></div>
-                </button>
-                <button onclick="setTheme(2)" class="p-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/5">
-                    <span class="text-xs font-bold">Nature</span>
-                    <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-                </button>
-                <button onclick="setTheme(3)" class="p-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/5">
-                    <span class="text-xs font-bold">Ocean</span>
-                    <div class="w-3 h-3 rounded-full bg-sky-500"></div>
-                </button>
+            <div id="theme-options" class="grid grid-cols-1 gap-2.5 mb-10">
+                <!-- Theme options will be rendered here -->
             </div>
             
-            <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[8px] font-bold opacity-30 uppercase tracking-widest">Total XP</span>
-                    <span class="xp-val font-black text-xs text-accent">0 XP</span>
+            <div class="p-6 bg-accent/10 rounded-[2.2rem] border border-accent/20">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-[9px] font-black opacity-40 uppercase tracking-[0.3em]">Progres Level</span>
+                    <span class="xp-val font-bold text-sm text-accent">0 XP</span>
                 </div>
-                <div class="h-1.5 w-full bg-black/20 rounded-full overflow-hidden">
+                <div class="h-2 w-full bg-black/30 rounded-full overflow-hidden">
                     <div class="xp-bar-main h-full bg-accent rounded-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL ADD ACTIVITY -->
-    <div id="modal" class="fixed inset-0 z-[400] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-lg">
-        <div class="glass w-full max-w-sm p-8 rounded-[2.5rem] border-white/20 animate-in zoom-in-95 duration-300">
-            <h3 class="text-xl font-black italic mb-6 tracking-tighter">Misi Baru 🎯</h3>
-            <input id="h-input" type="text" placeholder="Misal: Minum air putih" class="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm font-bold outline-none mb-4 text-current">
-            <div class="flex gap-2 mb-8 overflow-x-auto no-scrollbar pb-2">
-                <button onclick="setInp('🏃 Jalan 5m')" class="px-4 py-2 glass rounded-full text-[9px] font-bold whitespace-nowrap">🏃 Jalan</button>
-                <button onclick="setInp('💧 Minum Air')" class="px-4 py-2 glass rounded-full text-[9px] font-bold whitespace-nowrap">💧 Minum</button>
-                <button onclick="setInp('🧘 Napas 2m')" class="px-4 py-2 glass rounded-full text-[9px] font-bold whitespace-nowrap">🧘 Napas</button>
+    <!-- MODAL ADD -->
+    <div id="modal" class="fixed inset-0 z-[400] hidden items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
+        <div class="glass w-full max-w-md p-10 rounded-[3.5rem] border-white/20 animate-in zoom-in-95 duration-200">
+            <h3 class="text-3xl font-black italic mb-8 tracking-tighter text-center">Misi Baru 🎯</h3>
+            <input id="h-input" type="text" placeholder="Misal: Minum air putih" class="w-full bg-white/5 border border-white/10 rounded-3xl p-7 text-lg font-bold outline-none mb-6 text-current focus:ring-4 focus:ring-accent/20 transition-all">
+            <div class="flex gap-2 mb-10 overflow-x-auto no-scrollbar pb-1">
+                <button onclick="setInp('🏃 Jalan 5 Menit')" class="px-6 py-3 glass rounded-full text-xs font-bold whitespace-nowrap active:bg-white/15 transition-all">🏃 Jalan</button>
+                <button onclick="setInp('💧 Minum Air')" class="px-6 py-3 glass rounded-full text-xs font-bold whitespace-nowrap active:bg-white/15 transition-all">💧 Minum</button>
+                <button onclick="setInp('🧘 Napas 2m')" class="px-6 py-3 glass rounded-full text-xs font-bold whitespace-nowrap active:bg-white/15 transition-all">🧘 Napas</button>
             </div>
-            <div class="flex gap-3">
-                <button onclick="closeModal()" class="flex-1 py-4 text-xs font-bold opacity-30">Batal</button>
-                <button onclick="addHabit()" class="flex-[2] py-4 rounded-xl bg-accent text-white font-black text-sm shadow-lg">Mulai</button>
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 py-6 font-bold opacity-40">Batal</button>
+                <button onclick="addHabit()" class="flex-[2] py-6 rounded-3xl bg-accent text-white font-black text-xl shadow-xl active:scale-95">Mulai Misi</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- DATA & STATE ---
-        let habits = JSON.parse(localStorage.getItem('ht_v37_habits')) || [
-            { id: 1, name: 'Minum air putih pagi', done: false, streak: 5 },
-            { id: 2, name: 'Peregangan 2 menit', done: true, streak: 12 }
+        // --- DATA & PERSISTENCE ---
+        let habits = JSON.parse(localStorage.getItem('ht_v41_habits')) || [
+            { id: 1, name: 'Minum air putih setelah bangun', done: false, streak: 5 },
+            { id: 2, name: 'Lakukan stretching santai 2 menit', done: true, streak: 12 }
         ];
-        let xp = parseInt(localStorage.getItem('ht_v37_xp')) || 0;
-        let reflections = JSON.parse(localStorage.getItem('ht_v37_refs')) || [];
-        let themeIndex = parseInt(localStorage.getItem('ht_v37_theme')) || 0;
+        let xp = parseInt(localStorage.getItem('ht_v41_xp')) || 0;
+        let reflections = JSON.parse(localStorage.getItem('ht_v41_refs')) || [];
+        let themeIndex = parseInt(localStorage.getItem('ht_v41_theme')) || 0;
 
         const themes = [
-            { id: 'dark', name: 'Midnight' },
-            { id: 'light', name: 'Zenith' },
-            { id: 'nature', name: 'Nature' },
-            { id: 'ocean', name: 'Ocean' },
-            { id: 'sunset', name: 'Sunset' }
+            { id: 'dark', name: 'Midnight', color: 'bg-indigo-600' },
+            { id: 'garnet', name: 'Garnet', color: 'bg-red-600' },
+            { id: 'ocean', name: 'Ocean', color: 'bg-sky-500' },
+            { id: 'nature', name: 'Nature', color: 'bg-emerald-500' },
+            { id: 'light', name: 'Zenith', color: 'bg-blue-400' }
         ];
 
-        // --- SCROLL MINIMIZE LOGIC ---
+        // --- SCROLL OPTIMIZATION ---
         const mainScroll = document.getElementById('main-scroll');
         const header = document.getElementById('header');
+        let isMinimized = false;
+
         mainScroll.addEventListener('scroll', () => {
-            if (mainScroll.scrollTop > 30) {
-                header.classList.add('minimized');
-            } else {
-                header.classList.remove('minimized');
+            const currentScroll = mainScroll.scrollTop;
+            const shouldMinimize = currentScroll > 30;
+            if (shouldMinimize !== isMinimized) {
+                isMinimized = shouldMinimize;
+                requestAnimationFrame(() => {
+                    if (isMinimized) header.classList.add('minimized');
+                    else header.classList.remove('minimized');
+                });
             }
         }, { passive: true });
 
-        // --- UI FUNCTIONS ---
+        // --- NOTIFICATION SYSTEM (TOAST) ---
+        function showToast(msg) {
+            const existing = document.querySelector('.toast-notif');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-notif fixed top-8 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-full z-[600] shadow-2xl flex items-center gap-3 toast-animate';
+            toast.innerHTML = `<span class="text-accent text-lg">✨</span><span class="text-[11px] font-black uppercase tracking-widest leading-none">${msg}</span>`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.replace('toast-animate', 'fade-out');
+                toast.style.transform = 'translate(-50%, -20px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 2500);
+        }
+
+        // --- THEME ENGINE ---
         function applyTheme() {
             const theme = themes[themeIndex];
             document.body.setAttribute('data-theme', theme.id);
             document.querySelectorAll('#theme-name-desktop').forEach(el => el.innerText = theme.name);
-            localStorage.setItem('ht_v37_theme', themeIndex);
+            localStorage.setItem('ht_v41_theme', themeIndex);
             lucide.createIcons();
+            renderThemeOptions();
         }
 
         function setTheme(idx) {
             themeIndex = idx;
             applyTheme();
-            toggleThemePicker();
-            showToast(`Tema: ${themes[idx].name}`);
+            showToast(`Tema Aktif: ${themes[idx].name}`);
+        }
+
+        function renderThemeOptions() {
+            const container = document.getElementById('theme-options');
+            if(!container) return;
+            container.innerHTML = themes.map((t, idx) => `
+                <button onclick="setTheme(${idx})" class="p-5 rounded-2xl border transition-all flex items-center justify-between group ${themeIndex === idx ? 'border-accent bg-accent/15' : 'border-white/10 hover:bg-white/5'}">
+                    <div class="flex items-center gap-4">
+                        <div class="w-5 h-5 rounded-full ${t.color} shadow-lg shadow-black/20"></div>
+                        <span class="font-bold text-sm ${themeIndex === idx ? 'text-accent' : ''}">${t.name}</span>
+                    </div>
+                    ${themeIndex === idx ? '<span class="text-[8px] font-black uppercase text-accent tracking-widest bg-accent/10 px-3 py-1.5 rounded-full">Aktif</span>' : '<i data-lucide="circle" class="w-4 h-4 opacity-20 group-hover:opacity-40"></i>'}
+                </button>
+            `).join('');
+            lucide.createIcons();
         }
 
         function toggleThemePicker() {
@@ -417,20 +470,14 @@
             if(picker.classList.contains('hidden')) {
                 picker.classList.remove('hidden');
                 picker.classList.add('flex');
-                setTimeout(() => {
-                    picker.classList.add('opacity-100');
-                    card.classList.remove('translate-y-10');
-                }, 10);
+                setTimeout(() => { picker.classList.add('opacity-100'); card.classList.remove('translate-y-16'); }, 10);
             } else {
-                picker.classList.remove('opacity-100');
-                card.classList.add('translate-y-10');
-                setTimeout(() => {
-                    picker.classList.add('hidden');
-                    picker.classList.remove('flex');
-                }, 300);
+                picker.classList.remove('opacity-100'); card.classList.add('translate-y-16');
+                setTimeout(() => { picker.classList.add('hidden'); picker.classList.remove('flex'); }, 400);
             }
         }
 
+        // --- NAVIGATION ---
         function showTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + id).classList.add('active');
@@ -448,29 +495,34 @@
 
             if(id === 'reflection') renderReflections();
             if(id === 'planner') setEnergy('med');
-            mainScroll.scrollTo({ top: 0, behavior: 'smooth' });
+            mainScroll.scrollTo({ top: 0, behavior: 'auto' });
         }
 
-        // --- CORE LOGIC ---
+        // --- HABIT ACTIONS ---
         function renderHabits() {
             const container = document.getElementById('habit-list');
-            container.innerHTML = habits.length ? '' : `<div class="col-span-full py-8 text-center opacity-20 text-[10px] italic">Belum ada misi.</div>`;
+            container.innerHTML = habits.length ? '' : `<div class="py-16 text-center glass rounded-[3rem] border-dashed border-white/10 opacity-30 italic text-sm">Belum ada target hari ini. Klik + untuk memulai misi.</div>`;
             
             habits.forEach(h => {
                 const card = document.createElement('div');
-                card.className = `habit-card glass p-4 md:p-5 rounded-[1.25rem] md:rounded-[2rem] flex items-center justify-between group ${h.done ? 'done' : ''} cursor-pointer`;
+                card.className = `habit-card glass p-6 md:p-8 rounded-[2.2rem] md:rounded-[3rem] flex items-center justify-between group ${h.done ? 'done' : ''} cursor-pointer shadow-sm`;
                 card.onclick = () => toggleHabit(h.id);
                 card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${h.done ? 'bg-accent border-accent text-white' : 'border-current opacity-20'}">
-                            ${h.done ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
+                    <div class="flex items-center gap-5 md:gap-7">
+                        <div class="w-9 h-9 md:w-11 md:h-11 rounded-xl md:rounded-2xl border-2 flex items-center justify-center transition-all ${h.done ? 'bg-accent border-accent text-white shadow-lg' : 'border-current opacity-20'}">
+                            ${h.done ? '<i data-lucide="check" class="w-6 h-6"></i>' : ''}
                         </div>
                         <div>
-                            <h4 class="font-bold text-[11px] md:text-sm leading-tight">${h.name}</h4>
-                            <p class="text-[7px] font-black uppercase opacity-20 mt-1">${h.streak} Hari Berturut</p>
+                            <h4 class="font-bold text-base md:text-xl leading-tight">${h.name}</h4>
+                            <div class="flex items-center gap-2 mt-2 opacity-30">
+                                <i data-lucide="flame" class="w-3 h-3"></i>
+                                <p class="text-[9px] font-black uppercase tracking-widest">${h.streak} Hari Berhasil</p>
+                            </div>
                         </div>
                     </div>
-                    <button onclick="deleteHabit(event, ${h.id})" class="opacity-0 group-hover:opacity-100 p-2 text-rose-500 transition-opacity"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <button onclick="deleteHabit(event, ${h.id})" class="delete-btn p-3 text-rose-500">
+                        <i data-lucide="trash-2" class="w-6 h-6"></i>
+                    </button>
                 `;
                 container.appendChild(card);
             });
@@ -481,12 +533,27 @@
         function toggleHabit(id) {
             const h = habits.find(x => x.id === id);
             h.done = !h.done;
-            if(h.done) { h.streak++; xp += 50; showToast("Kemenangan kecil! +50 XP"); } 
-            else { h.streak = Math.max(0, h.streak - 1); }
+            if(h.done) { 
+                h.streak++; 
+                addXP(50);
+                showToast("Target Terlampaui! +50 XP");
+            } else { 
+                h.streak = Math.max(0, h.streak - 1); 
+            }
             save(); renderHabits();
         }
 
-        function deleteHabit(e, id) { e.stopPropagation(); habits = habits.filter(x => x.id !== id); save(); renderHabits(); }
+        function deleteHabit(e, id) { 
+            e.stopPropagation(); 
+            habits = habits.filter(x => x.id !== id); 
+            save(); renderHabits(); 
+            showToast("Misi Dihapus");
+        }
+
+        function addXP(amount) {
+            xp += amount;
+            updateStats();
+        }
 
         function updateStats() {
             const level = Math.floor(xp / 1000) + 1;
@@ -496,46 +563,46 @@
             document.querySelectorAll('.xp-bar-main').forEach(el => el.style.width = `${progress}%`);
         }
 
+        // --- REFLECTION ACTIONS ---
         function saveReflection() {
             const val = document.getElementById('ref-input').value.trim();
             if(!val) return;
             reflections.unshift({ text: val, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) });
             document.getElementById('ref-input').value = '';
-            xp += 100; save(); renderReflections(); updateStats();
-            showToast("Refleksi disimpan! +100 XP");
+            addXP(100); save(); renderReflections(); updateStats();
+            showToast("Refleksi Tersimpan! +100 XP");
         }
 
         function renderReflections() {
             const container = document.getElementById('ref-history');
-            container.innerHTML = reflections.length ? '' : `<p class="text-center opacity-20 text-[9px] py-6 italic">Belum ada riwayat.</p>`;
+            container.innerHTML = reflections.length ? '' : `<p class="text-center opacity-20 text-[10px] py-10 italic">Belum ada riwayat refleksi hari ini.</p>`;
             reflections.slice(0, 3).forEach(r => {
                 const div = document.createElement('div');
-                div.className = 'glass p-4 rounded-2xl opacity-50';
-                div.innerHTML = `<p class="text-[10px] italic mb-1">"${r.text}"</p><span class="text-[7px] font-black opacity-20 uppercase">${r.date}</span>`;
+                div.className = 'glass p-6 rounded-[2.2rem] opacity-60 hover:opacity-100 transition-opacity';
+                div.innerHTML = `<p class="text-sm italic mb-3 leading-relaxed">"${r.text}"</p><div class="flex items-center gap-2 opacity-30"><i data-lucide="clock" class="w-3 h-3"></i><span class="text-[8px] font-black uppercase">${r.date}</span></div>`;
                 container.appendChild(div);
             });
+            lucide.createIcons();
         }
 
+        // --- ENERGY PLANNER ---
         function setEnergy(level) {
-            document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('border-accent', 'bg-accent/10'));
-            document.getElementById('e-' + level).classList.add('border-accent', 'bg-accent/10');
-            const tasks = { low: ["Meditasi 5m", "Minum Air", "Musik"], med: ["Jalan 10m", "Baca 2 hal", "Meja rapi"], high: ["Olahraga 20m", "Fokus 1 jam", "Tugas sulit"] };
+            document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active-energy'));
+            document.getElementById('e-' + level).classList.add('active-energy');
+            const tasks = { 
+                low: ["Meditasi Napas 5m", "Minum Air Segar", "Mendengar Musik Zen"], 
+                med: ["Jalan Kaki 10m", "Baca 2 Hal Buku", "Rapikan Meja Kerja"], 
+                high: ["Olahraga Intens 20m", "Fokus Belajar 1 Jam", "Selesaikan Misi Sulit"] 
+            };
             const container = document.getElementById('planner-tasks');
-            container.innerHTML = tasks[level].map(t => `<div class="glass p-3 rounded-xl border-l-4 border-accent text-[10px] font-bold animate-in slide-in-from-left">${t}</div>`).join('');
+            container.innerHTML = tasks[level].map((t, i) => `<div class="glass p-6 rounded-[1.8rem] border-l-4 border-accent text-xs font-bold animate-in slide-in-from-left duration-300" style="animation-delay: ${i*100}ms">${t}</div>`).join('');
         }
 
-        function showToast(msg) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 glass px-6 py-2 rounded-full z-[600] text-[9px] font-bold shadow-2xl animate-in slide-in-from-top-4';
-            toast.innerHTML = `<span class="text-accent">✨</span> ${msg}`;
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.classList.add('opacity-0', 'translate-y-[-10px]'); setTimeout(() => toast.remove(), 500); }, 2000);
-        }
-
+        // --- UTILS ---
         function save() { 
-            localStorage.setItem('ht_v37_habits', JSON.stringify(habits)); 
-            localStorage.setItem('ht_v37_xp', xp.toString()); 
-            localStorage.setItem('ht_v37_refs', JSON.stringify(reflections)); 
+            localStorage.setItem('ht_v41_habits', JSON.stringify(habits)); 
+            localStorage.setItem('ht_v41_xp', xp.toString()); 
+            localStorage.setItem('ht_v41_refs', JSON.stringify(reflections)); 
         }
 
         function openModal() { document.getElementById('modal').classList.remove('hidden'); document.getElementById('modal').classList.add('flex'); }
@@ -547,15 +614,22 @@
             if(!name) return;
             habits.unshift({ id: Date.now(), name, done: false, streak: 0 });
             document.getElementById('h-input').value = ''; closeModal(); save(); renderHabits();
-            showToast("Misi baru dimulai! 🔥");
+            showToast("Misi Dimulai! 🔥");
         }
 
+        // --- BOOT ---
+        applyTheme();
+
         window.onload = () => {
-            applyTheme(); renderHabits(); setEnergy('med');
+            renderHabits(); 
+            setEnergy('med');
             const hours = new Date().getHours();
-            const greet = hours < 11 ? "Pagi" : hours < 15 ? "Siang" : hours < 19 ? "Sore" : "Malam";
-            document.getElementById('greeting').innerText = `Selamat ${greet}, Pejuang!`;
+            const greet = hours < 11 ? "Selamat Pagi" : hours < 15 ? "Selamat Siang" : hours < 19 ? "Selamat Sore" : "Selamat Malam";
+            document.getElementById('greeting').innerText = `${greet}, Pejuang!`;
             document.getElementById('date-display').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+            
+            const TIPS = ["Ambil napas sejenak. 🌿", "Langkah kecil cukup. ✨", "Konsistensi adalah kunci. 🔋", "Hari baru, misi baru. 🤍"];
+            document.getElementById('reminder-msg').innerText = `"${TIPS[Math.floor(Math.random() * TIPS.length)]}"`;
         }
     </script>
 </body>
