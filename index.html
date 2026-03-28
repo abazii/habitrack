@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HABITrack - Pro v6.0 Cloud</title>
+    <title>HABITrack - Pro v5.2 Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
@@ -21,34 +22,18 @@
         }
 
         [data-theme="light"] {
-            --bg: #f1f5f9;
-            --text-main: #0f172a;
-            --primary: #4f46e5;
-            --secondary: #db2777;
-            --glass: rgba(255, 255, 255, 0.9); 
-            --glass-border: rgba(0, 0, 0, 0.08);
-            --orb-opacity: 0.12;
-            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --bg: #f1f5f9; --text-main: #0f172a; --primary: #4f46e5; --secondary: #db2777;
+            --glass: rgba(255, 255, 255, 0.9); --glass-border: rgba(0, 0, 0, 0.08); --orb-opacity: 0.12;
         }
 
         [data-theme="garnet"] {
-            --bg: #1a0505;
-            --text-main: #fef2f2;
-            --primary: #ef4444;
-            --secondary: #fca5a5;
-            --glass: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(239, 68, 68, 0.2);
-            --orb-opacity: 0.25;
+            --bg: #1a0505; --text-main: #fef2f2; --primary: #ef4444; --secondary: #fca5a5;
+            --glass: rgba(255, 255, 255, 0.04); --glass-border: rgba(239, 68, 68, 0.2); --orb-opacity: 0.25;
         }
 
         [data-theme="nature"] {
-            --bg: #021a14;
-            --text-main: #ecfdf5;
-            --primary: #10b981;
-            --secondary: #84cc16;
-            --glass: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(16, 185, 129, 0.2);
-            --orb-opacity: 0.25;
+            --bg: #021a14; --text-main: #ecfdf5; --primary: #10b981; --secondary: #84cc16;
+            --glass: rgba(255, 255, 255, 0.04); --glass-border: rgba(16, 185, 129, 0.2); --orb-opacity: 0.25;
         }
 
         body {
@@ -56,610 +41,391 @@
             background-color: var(--bg);
             color: var(--text-main);
             overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
             transition: background-color 0.5s ease;
         }
 
         .text-accent { color: var(--primary); }
         .bg-accent { background-color: var(--primary); }
-        
-        [data-theme="light"] .bg-accent { color: #ffffff !important; }
+        .glass { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid var(--glass-border); box-shadow: var(--shadow); }
 
-        .glass {
-            background: var(--glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow);
-        }
-
-        .liquid-container {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .orb {
-            position: absolute;
-            width: 80vw;
-            height: 80vw;
-            filter: blur(100px);
-            opacity: var(--orb-opacity);
-            animation: morph 20s infinite alternate linear;
-        }
-
+        .liquid-container { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .orb { position: absolute; width: 80vw; height: 80vw; filter: blur(100px); opacity: var(--orb-opacity); animation: morph 20s infinite alternate linear; transition: background-color 0.8s ease; }
         .orb-1 { background: var(--primary); top: -20%; left: -20%; }
         .orb-2 { background: var(--secondary); bottom: -20%; right: -20%; animation-delay: -5s; }
 
-        @keyframes morph {
-            0% { border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%; transform: translate(0,0); }
-            100% { border-radius: 60% 40% 40% 60% / 60% 60% 40% 40%; transform: translate(5%, 5%); }
-        }
+        @keyframes morph { 0% { border-radius: 40% 60% 60% 40%; } 100% { border-radius: 60% 40% 40% 60%; } }
 
         .habit-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .habit-card.done { transform: scale(0.95); opacity: 0.6; filter: grayscale(100%); pointer-events: none; }
+        .habit-card.done { transform: scale(0.95); opacity: 0.6; filter: grayscale(100%); }
 
         .energy-btn { opacity: 0.4; transition: all 0.3s ease; }
-        .energy-btn.active-energy {
-            border: 2px solid var(--primary);
-            background: rgba(var(--primary), 0.1);
-            opacity: 1;
-            transform: translateY(-2px);
-        }
+        .energy-btn.active-energy { border: 2px solid var(--primary); opacity: 1; transform: translateY(-2px); }
 
-        .difficulty-chip {
-            font-size: 8px;
-            padding: 2px 10px;
-            border-radius: 99px;
-            text-transform: uppercase;
-            font-weight: 800;
-        }
-
+        .difficulty-chip { font-size: 8px; padding: 2px 10px; border-radius: 99px; text-transform: uppercase; font-weight: 800; }
         .diff-easy { background: rgba(16, 185, 129, 0.15); color: #10b981; }
         .diff-medium { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
         .diff-hard { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
+        .no-scrollbar::-webkit-scrollbar { display: none; }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: slideUp 0.4s ease-out; }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .loading-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 2000;
-            background: #030712;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .sync-badge {
-            font-size: 8px;
-            font-weight: 800;
-            text-transform: uppercase;
-            background: rgba(16, 185, 129, 0.1);
-            color: #10b981;
-            padding: 4px 10px;
-            border-radius: 99px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+        #onboarding, #loading-screen, #modal, #theme-picker {
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(15px); z-index: 1000;
         }
     </style>
 </head>
 <body data-theme="dark">
-
-    <div id="loading-overlay" class="loading-screen">
-        <img src="1774532838452.png" alt="Logo" class="h-16 w-16 animate-pulse object-contain">
-        <p class="text-[10px] font-black uppercase tracking-[0.5em] opacity-50">Menyambungkan Awan...</p>
-    </div>
 
     <div class="liquid-container">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
     </div>
 
-    <!-- ONBOARDING -->
-    <div id="onboarding" class="fixed inset-0 z-[1000] flex items-center justify-center p-6 hidden bg-black/80 backdrop-blur-xl">
+    <div id="loading-screen" class="fixed inset-0 flex flex-col items-center justify-center">
+        <div class="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Sinkronisasi Cloud...</p>
+    </div>
+
+    <div id="onboarding" class="fixed inset-0 hidden items-center justify-center p-6">
         <div class="glass w-full max-w-md p-10 rounded-[3.5rem] text-center space-y-8">
-            <img src="1774532838452.png" alt="Logo" class="h-20 w-20 mx-auto object-contain">
-            <h2 class="text-3xl font-black italic tracking-tighter">Halo, <span class="text-accent">Pejuang Baru!</span></h2>
-            <input id="user-name-input" type="text" placeholder="Masukkan namamu..." class="w-full bg-white/5 border-2 border-white/10 rounded-3xl p-6 text-xl font-bold text-center outline-none focus:border-accent">
-            <button onclick="saveInitialName()" class="w-full py-6 bg-accent rounded-3xl text-white font-black text-xl shadow-xl active:scale-95 transition-all">Mulai Petualangan</button>
+            <img src="1774532838452.png" alt="Logo" class="h-20 w-20 mx-auto">
+            <h2 class="text-3xl font-black italic tracking-tighter">Pilih Mode <span class="text-accent">Pejuang</span></h2>
+            <div class="space-y-4">
+                <button onclick="loginCloud()" class="w-full py-5 bg-accent rounded-3xl text-white font-black text-lg shadow-xl">Login dengan Google</button>
+                <div class="flex items-center gap-4 opacity-20 py-2">
+                    <hr class="flex-1 border-white/20"> <span class="text-[8px] font-bold uppercase">Atau</span> <hr class="flex-1 border-white/20">
+                </div>
+                <input id="guest-name-input" type="text" placeholder="Nama Guest..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-center outline-none focus:border-accent text-white">
+                <button onclick="startAsGuest()" class="w-full py-4 border border-white/10 rounded-2xl font-bold opacity-60">Mode Lokal (Guest)</button>
+            </div>
         </div>
     </div>
 
     <div class="flex flex-col md:flex-row h-screen overflow-hidden">
         
-        <!-- SIDEBAR -->
         <aside class="hidden md:flex w-72 flex-col glass m-6 rounded-[2.5rem] p-8 z-50">
-            <div class="mb-10 flex items-center gap-4">
+            <div class="mb-12 flex items-center gap-4">
                 <img src="1774532838452.png" alt="Logo" class="h-10 w-10 object-contain">
                 <div>
                     <h1 class="text-xl font-black italic tracking-tighter leading-none">HABIT<span class="text-accent">rack</span></h1>
-                    <p class="text-[7px] font-bold opacity-30 uppercase tracking-[0.4em] mt-1.5">v6.0 Cloud Pro</p>
+                    <p id="mode-badge" class="text-[7px] font-bold opacity-30 uppercase tracking-[0.4em] mt-1.5">v5.2 PRO</p>
                 </div>
             </div>
             
-            <div onclick="toggleThemePicker()" class="glass rounded-[2rem] p-5 mb-8 cursor-pointer hover:scale-[1.02] transition-all">
+            <div onclick="toggleThemePicker()" class="glass rounded-[2rem] p-5 mb-10 cursor-pointer">
                 <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent shadow-inner">
+                    <div class="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent">
                         <i data-lucide="award" class="w-6 h-6"></i>
                     </div>
                     <div class="flex-1 overflow-hidden">
-                        <p id="rank-name" class="text-[8px] font-black opacity-40 uppercase tracking-widest truncate">Memuat...</p>
+                        <p id="rank-name" class="text-[8px] font-black opacity-40 uppercase tracking-widest truncate">Newbie</p>
                         <p class="xp-val font-bold text-base text-accent leading-none">0 XP</p>
                     </div>
                 </div>
                 <div class="h-1.5 w-full bg-black/10 rounded-full overflow-hidden mb-2">
-                    <div class="xp-bar-main h-full bg-accent rounded-full transition-all duration-700" style="width: 0%"></div>
+                    <div id="xp-bar-main" class="h-full bg-accent rounded-full transition-all duration-700"></div>
                 </div>
-                <div class="flex justify-between items-center">
-                    <div class="sync-badge"><i data-lucide="cloud-check" class="w-2.5 h-2.5"></i> Cloud Synced</div>
-                    <p class="text-[7px] opacity-40 font-bold uppercase">Lvl <span class="level-val">1</span></p>
-                </div>
+                <p class="text-[7px] opacity-40 font-bold text-right uppercase">Lvl <span class="level-val">1</span></p>
             </div>
 
             <nav class="space-y-2 flex-1">
-                <button onclick="showTab('home')" id="nav-home" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all text-accent bg-white/5 nav-active">
+                <button onclick="showTab('home')" id="nav-home" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold text-accent bg-white/5 nav-active">
                     <i data-lucide="layout-grid" class="w-5 h-5"></i> Dashboard
                 </button>
-                <button onclick="showTab('planner')" id="nav-planner" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold opacity-30 hover:opacity-100 transition-all">
+                <button onclick="showTab('planner')" id="nav-planner" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold opacity-30">
                     <i data-lucide="zap" class="w-5 h-5"></i> Planner
                 </button>
-                <button onclick="showTab('reflection')" id="nav-reflection" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold opacity-30 hover:opacity-100 transition-all">
-                    <i data-lucide="leaf" class="w-5 h-5"></i> Refleksi
+                <button onclick="showTab('reflection')" id="nav-reflection" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold opacity-30">
+                    <i data-lucide="leaf" class="w-5 h-5"></i> Reflection
                 </button>
             </nav>
 
-            <div class="mt-auto pt-6 border-t border-white/5 opacity-20 hover:opacity-100 transition-opacity">
-                <p class="text-[7px] font-black uppercase tracking-widest mb-1">User ID:</p>
-                <p id="display-uid" class="text-[8px] font-mono break-all leading-tight">Authenticating...</p>
-            </div>
+            <button onclick="logout()" class="mt-auto flex items-center gap-3 opacity-30 hover:opacity-100 font-bold text-xs p-4">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+            </button>
         </aside>
 
-        <!-- MAIN VIEWPORT -->
         <div id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar relative z-10">
-            <header class="sticky top-0 z-[100] px-6 py-6 flex justify-between items-center md:hidden bg-transparent">
-                <div class="flex items-center gap-3">
-                    <img src="1774532838452.png" alt="Logo" class="h-8 w-8 object-contain">
-                    <h1 class="text-xl font-black italic tracking-tighter">HABITrack</h1>
-                </div>
-                <button onclick="toggleThemePicker()" class="glass w-10 h-10 rounded-xl flex items-center justify-center text-accent active:scale-90 transition-all shadow-lg">
-                    <i data-lucide="palette" class="w-5 h-5"></i>
-                </button>
-            </header>
-
-            <div class="max-w-4xl mx-auto px-6 md:px-12 pb-40 space-y-12 md:pt-16">
+            <div class="max-w-4xl mx-auto px-6 md:px-12 pb-40 space-y-12 pt-12 md:pt-16">
+                
                 <section>
                     <h2 class="text-4xl md:text-7xl font-black tracking-tighter italic leading-none">
                         Halo, <span id="display-name" class="text-accent underline decoration-4 underline-offset-8">Pejuang</span>!
                     </h2>
-                    <div class="flex items-center gap-3 mt-6 opacity-40">
-                        <i data-lucide="calendar" class="w-4 h-4"></i>
-                        <p id="date-display" class="text-[10px] font-bold uppercase tracking-[0.2em]">Memuat...</p>
-                    </div>
+                    <p id="date-display" class="text-[10px] font-bold uppercase tracking-[0.2em] mt-6 opacity-40">...</p>
                 </section>
 
-                <div id="tab-home" class="tab-content active space-y-10">
+                <div id="tab-home" class="tab-content active space-y-8">
                     <div class="space-y-4">
                         <div class="flex justify-between items-center px-2">
-                            <div>
-                                <h3 class="text-xl font-black italic uppercase tracking-widest opacity-40">Misi Aktif</h3>
-                                <p class="text-[10px] opacity-30 font-bold uppercase mt-1">Selesaikan satu persatu</p>
-                            </div>
-                            <button onclick="openModal()" class="w-14 h-14 bg-accent rounded-2xl flex items-center justify-center text-white shadow-xl hover:scale-105 active:scale-90 transition-all">
+                            <h3 class="text-xl font-black italic uppercase tracking-widest opacity-40">Misi Aktif</h3>
+                            <button onclick="openModal()" class="w-14 h-14 bg-accent rounded-2xl flex items-center justify-center text-white shadow-xl">
                                 <i data-lucide="plus" class="w-7 h-7"></i>
                             </button>
                         </div>
                         <div id="habit-list-active" class="flex flex-col gap-3"></div>
                     </div>
-
-                    <div class="space-y-4 pt-6">
-                        <div class="flex items-center gap-3 px-2">
-                            <i data-lucide="check-circle" class="w-4 h-4 opacity-20"></i>
-                            <h3 class="text-xs font-black italic uppercase tracking-widest opacity-20">Selesai Hari Ini</h3>
-                        </div>
-                        <div id="habit-list-done" class="flex flex-col gap-3"></div>
-                    </div>
                 </div>
 
-                <!-- PLANNER -->
                 <div id="tab-planner" class="tab-content space-y-10">
-                    <div class="text-center space-y-2">
-                        <h3 class="text-3xl font-black italic uppercase tracking-tighter">Vibe Check ⚡</h3>
-                        <p class="text-sm opacity-40 italic">Sesuaikan ambisi dengan energi hari ini.</p>
-                    </div>
                     <div class="flex gap-4">
                         <button onclick="setEnergy('low')" id="e-low" class="energy-btn flex-1 glass py-10 rounded-[2.5rem] flex flex-col items-center gap-3">
-                            <span class="text-4xl">☁️</span>
-                            <span class="text-[10px] font-black uppercase tracking-widest">Chill</span>
+                            <span class="text-4xl">☁️</span> <span class="text-[10px] font-black uppercase">Chill</span>
                         </button>
                         <button onclick="setEnergy('med')" id="e-med" class="energy-btn flex-1 glass py-10 rounded-[2.5rem] flex flex-col items-center gap-3">
-                            <span class="text-4xl">🔋</span>
-                            <span class="text-[10px] font-black uppercase tracking-widest">Fokus</span>
+                            <span class="text-4xl">🔋</span> <span class="text-[10px] font-black uppercase">Fokus</span>
                         </button>
                         <button onclick="setEnergy('high')" id="e-high" class="energy-btn flex-1 glass py-10 rounded-[2.5rem] flex flex-col items-center gap-3">
-                            <span class="text-4xl">⚡</span>
-                            <span class="text-[10px] font-black uppercase tracking-widest">Grind</span>
+                            <span class="text-4xl">⚡</span> <span class="text-[10px] font-black uppercase">Grind</span>
                         </button>
                     </div>
-                    <div id="planner-tasks" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4"></div>
+                    <div id="planner-tasks" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
-                <!-- REFLECTION -->
                 <div id="tab-reflection" class="tab-content space-y-8">
-                    <div class="glass p-8 md:p-12 rounded-[3.5rem] space-y-8">
-                        <div class="text-center">
-                            <h3 class="text-3xl font-black italic">Journal Santai ✍️</h3>
-                            <p class="text-xs opacity-40 italic mt-2">"Satu hal baik yang terjadi hari ini?"</p>
-                        </div>
-                        <textarea id="ref-input" placeholder="Tuliskan di sini..." class="w-full h-40 bg-white/5 border border-white/10 rounded-3xl p-6 text-base outline-none focus:ring-4 focus:ring-accent/10 transition-all resize-none text-current"></textarea>
-                        <button onclick="saveReflection()" class="w-full py-6 rounded-3xl bg-accent text-white font-black text-xl shadow-xl active:scale-95 transition-all">Simpan & +100 XP</button>
+                    <div class="glass p-8 rounded-[3.5rem] space-y-8">
+                        <textarea id="ref-input" placeholder="Apa hal baik hari ini?" class="w-full h-32 bg-white/5 border border-white/10 rounded-3xl p-6 text-base outline-none focus:border-accent text-white resize-none"></textarea>
+                        <button onclick="saveReflection()" class="w-full py-6 rounded-3xl bg-accent text-white font-black text-xl">Simpan & +100 XP</button>
                     </div>
                     <div id="ref-history" class="space-y-4"></div>
                 </div>
+
             </div>
         </div>
 
-        <!-- MOBILE NAV -->
-        <nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] z-[150] glass rounded-[2.5rem] p-2 flex justify-around shadow-2xl">
-            <button onclick="showTab('home')" class="p-5 rounded-2xl text-accent bg-white/5 transition-all" id="m-nav-home">
-                <i data-lucide="layout-grid" class="w-6 h-6"></i>
-            </button>
-            <button onclick="showTab('planner')" class="p-5 rounded-2xl opacity-20 transition-all" id="m-nav-planner">
-                <i data-lucide="zap" class="w-6 h-6"></i>
-            </button>
-            <button onclick="showTab('reflection')" class="p-5 rounded-2xl opacity-20 transition-all" id="m-nav-reflection">
-                <i data-lucide="leaf" class="w-6 h-6"></i>
-            </button>
+        <nav class="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] z-[150] glass rounded-[2.5rem] p-2 flex justify-around">
+            <button onclick="showTab('home')" class="p-5 rounded-2xl text-accent" id="m-nav-home"><i data-lucide="layout-grid"></i></button>
+            <button onclick="showTab('planner')" class="p-5 rounded-2xl opacity-20" id="m-nav-planner"><i data-lucide="zap"></i></button>
+            <button onclick="showTab('reflection')" class="p-5 rounded-2xl opacity-20" id="m-nav-reflection"><i data-lucide="leaf"></i></button>
         </nav>
     </div>
 
-    <!-- THEME PICKER -->
-    <div id="theme-picker" class="fixed inset-0 z-[500] hidden items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
-        <div class="glass w-full max-w-sm p-10 rounded-[3.5rem] relative animate-in zoom-in-95 duration-200">
-            <button onclick="toggleThemePicker()" class="absolute top-8 right-8 opacity-40 hover:opacity-100 transition-opacity"><i data-lucide="x"></i></button>
-            <h3 class="font-black italic text-2xl mb-8">Ubah Vibe 🎨</h3>
-            <div id="theme-options" class="grid grid-cols-1 gap-3"></div>
-        </div>
-    </div>
-
-    <!-- MODAL -->
-    <div id="modal" class="fixed inset-0 z-[600] hidden items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
-        <div class="glass w-full max-w-md p-10 rounded-[3.5rem] animate-in zoom-in-95 duration-200">
+    <div id="modal" class="fixed inset-0 hidden items-center justify-center p-6">
+        <div class="glass w-full max-w-md p-10 rounded-[3.5rem]">
             <h3 class="text-3xl font-black italic mb-8 text-center">Buat Target 🎯</h3>
-            <div class="space-y-6">
-                <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-4 mb-2 block">Nama Habit</label>
-                    <input id="h-input" type="text" placeholder="Misal: Minum air 2L" class="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-lg font-bold outline-none text-current focus:border-accent">
-                </div>
-                <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-4 mb-2 block">Kesulitan</label>
-                    <div class="flex gap-2 p-1.5 glass rounded-2xl">
-                        <button onclick="setDiff('easy')" id="d-easy" class="diff-btn flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all">Easy</button>
-                        <button onclick="setDiff('medium')" id="d-medium" class="diff-btn flex-1 py-3 rounded-xl border-2 border-accent text-[9px] font-black uppercase bg-accent/10 text-accent transition-all">Med</button>
-                        <button onclick="setDiff('hard')" id="d-hard" class="diff-btn flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all">Hard</button>
-                    </div>
-                </div>
-                <div class="flex gap-4 pt-6">
-                    <button onclick="closeModal()" class="flex-1 py-5 font-bold opacity-40">Batal</button>
-                    <button onclick="addHabit()" class="flex-[2] py-5 rounded-3xl bg-accent text-white font-black text-xl shadow-xl active:scale-95 transition-all">Mulai</button>
-                </div>
+            <input id="h-input" type="text" placeholder="Nama Habit..." class="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-lg font-bold outline-none text-white mb-6">
+            <div class="flex gap-2 p-1.5 glass rounded-2xl mb-6">
+                <button onclick="setDiff('easy')" id="d-easy" class="flex-1 py-3 rounded-xl text-[9px] font-black uppercase">Easy</button>
+                <button onclick="setDiff('medium')" id="d-medium" class="flex-1 py-3 rounded-xl text-[9px] font-black uppercase border-2 border-accent bg-accent/10 text-accent">Med</button>
+                <button onclick="setDiff('hard')" id="d-hard" class="flex-1 py-3 rounded-xl text-[9px] font-black uppercase">Hard</button>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 py-5 opacity-40">Batal</button>
+                <button onclick="addHabit()" class="flex-[2] py-5 rounded-3xl bg-accent text-white font-black text-xl">Mulai</button>
             </div>
         </div>
     </div>
 
-    <!-- FIREBASE INTEGRATION -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, query, addDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    <div id="theme-picker" class="fixed inset-0 hidden items-center justify-center p-6">
+        <div class="glass w-full max-w-sm p-10 rounded-[3.5rem] relative">
+            <button onclick="toggleThemePicker()" class="absolute top-8 right-8 opacity-40"><i data-lucide="x"></i></button>
+            <h3 class="font-black italic text-2xl mb-8">Pilih Tema 🎨</h3>
+            <div id="theme-options" class="grid gap-3"></div>
+        </div>
+    </div>
 
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'habitrack-pro-v6';
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    <script>
+        const SB_URL = 'https://etjykvytvtyblvnclcrwdx.supabase.co';
+        const SB_KEY = 'sb_publishable_5yVj1ak_Lq1FkGbwlYL4yA_3FM2dJWh';
+        const sb = supabase.createClient(SB_URL, SB_KEY);
 
+        let isGuest = localStorage.getItem('ht_mode') === 'guest';
         let currentUser = null;
+        let userData = { name: "Pejuang", xp: 0, theme: 0, lastLogin: "" };
         let habits = [];
-        let profile = { name: '', xp: 0, theme: 0, lastLogin: '' };
+        let reflections = [];
         let currentDiff = 'medium';
 
-        const XP_MAP = { easy: 20, medium: 50, hard: 100 };
-        const RANKS = [
-            { min: 0, name: "Newbie Runner" },
-            { min: 500, name: "Habit Apprentice" },
-            { min: 1500, name: "Daily Warrior" },
-            { min: 3000, name: "Consistency King" },
-            { min: 8000, name: "Habit Master" }
+        const themes = [
+            { id: 'dark', name: 'Midnight', color: '#6366f1' },
+            { id: 'nature', name: 'Greenery', color: '#10b981' },
+            { id: 'garnet', name: 'Garnet', color: '#ef4444' },
+            { id: 'light', name: 'Zenith', color: '#4f46e5' }
         ];
 
-        // --- AUTH FLOW ---
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Auth failed:", err);
-                showToast("Gagal menyambungkan ke awan.");
-            }
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('display-uid').innerText = user.uid;
-                await initDataListeners();
-                document.getElementById('loading-overlay').style.display = 'none';
-            }
-        });
-
-        // --- CLOUD SYNC LOGIC ---
-        async function initDataListeners() {
-            if (!currentUser) return;
-
-            // 1. Profile Listener
-            const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
-            onSnapshot(profileRef, (snap) => {
-                if (snap.exists()) {
-                    profile = snap.data();
-                    const today = new Date().toDateString();
-                    if (profile.lastLogin !== today) resetDailyHabits(today);
-                    updateUI();
-                    applyTheme();
-                } else {
-                    document.getElementById('onboarding').style.display = 'flex';
-                }
-            });
-
-            // 2. Habits Listener
-            const habitCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'habits');
-            onSnapshot(habitCol, (snap) => {
-                habits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderHabits();
-            });
-
-            // 3. Reflections Listener
-            const refCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'reflections');
-            onSnapshot(refCol, (snap) => {
-                const refs = snap.docs.map(d => d.data());
-                renderReflections(refs);
-            });
-        }
-
-        async function resetDailyHabits(today) {
-            profile.lastLogin = today;
-            await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main'), { lastLogin: today });
-            for (const h of habits) {
-                const hRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'habits', h.id);
-                if (!h.done) await updateDoc(hRef, { streak: 0 });
-                await updateDoc(hRef, { done: false });
+        async function checkSession() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (session) {
+                isGuest = false;
+                currentUser = session.user;
+                localStorage.setItem('ht_mode', 'cloud');
+                await syncCloud();
+            } else if (isGuest) {
+                loadLocal();
+            } else {
+                document.getElementById('onboarding').style.display = 'flex';
+                document.getElementById('loading-screen').style.display = 'none';
             }
         }
 
-        // --- ACTION EXPORTS ---
-        window.saveInitialName = async () => {
-            const name = document.getElementById('user-name-input').value.trim();
+        async function loginCloud() { await sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } }); }
+        function startAsGuest() {
+            const name = document.getElementById('guest-name-input').value.trim();
             if (!name) return;
-            const ref = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
-            await setDoc(ref, { name, xp: 0, theme: 0, lastLogin: new Date().toDateString() });
-            document.getElementById('onboarding').style.display = 'none';
-        };
+            localStorage.setItem('ht_mode', 'guest');
+            localStorage.setItem('ht_name_v52', name);
+            location.reload();
+        }
 
-        window.toggleHabit = async (id) => {
-            const h = habits.find(x => x.id === id);
-            if (h && !h.done) {
-                const hRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'habits', id);
-                await updateDoc(hRef, { done: true, streak: h.streak + 1 });
-                
-                const earnedXP = XP_MAP[h.difficulty] || 50;
-                const pRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
-                await updateDoc(pRef, { xp: profile.xp + earnedXP });
-                showToast(`+${earnedXP} XP! Terus konsisten.`);
+        async function syncCloud() {
+            const { data: stats } = await sb.from('user_stats').select('*').eq('id', currentUser.id).single();
+            if (stats) {
+                userData = stats;
+            } else {
+                const { data } = await sb.from('user_stats').insert([{ id: currentUser.id, name: currentUser.user_metadata.full_name || "Pejuang", xp: 0, theme: 0 }]).select().single();
+                userData = data;
             }
-        };
+            const { data: hb } = await sb.from('habits').select('*').order('id', { ascending: false });
+            habits = hb || [];
+            const { data: ref } = await sb.from('reflections').select('*').order('id', { ascending: false });
+            reflections = ref || [];
+            finalize();
+        }
 
-        window.addHabit = async () => {
+        function loadLocal() {
+            userData.name = localStorage.getItem('ht_name_v52') || "Guest";
+            userData.xp = parseInt(localStorage.getItem('ht_xp_v52')) || 0;
+            userData.theme = parseInt(localStorage.getItem('ht_theme_v52')) || 0;
+            habits = JSON.parse(localStorage.getItem('ht_habits_v52')) || [];
+            reflections = JSON.parse(localStorage.getItem('ht_refs_v52')) || [];
+            finalize();
+        }
+
+        function finalize() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('date-display').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+            applyTheme();
+            updateUI();
+        }
+
+        async function addHabit() {
             const name = document.getElementById('h-input').value.trim();
             if (!name) return;
-            const hCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'habits');
-            await addDoc(hCol, { name, done: false, streak: 0, difficulty: currentDiff, createdAt: serverTimestamp() });
-            document.getElementById('h-input').value = '';
-            closeModal();
-            showToast("Misi baru ditambahkan!");
-        };
+            const h = { name, difficulty: currentDiff, streak: 0, done: false };
+            if (isGuest) { h.id = Date.now(); habits.unshift(h); saveLocal(); }
+            else { const { data } = await sb.from('habits').insert([{ ...h, user_id: currentUser.id }]).select(); habits.unshift(data[0]); }
+            closeModal(); updateUI();
+        }
 
-        window.deleteHabit = async (e, id) => {
+        async function toggleHabit(id) {
+            const h = habits.find(x => x.id === id);
+            if (!h || h.done) return;
+            h.done = true; h.streak++;
+            const earned = { easy: 20, medium: 50, hard: 100 }[h.difficulty];
+            userData.xp += earned;
+            if (isGuest) saveLocal();
+            else {
+                await sb.from('habits').update({ done: true, streak: h.streak }).eq('id', id);
+                await sb.from('user_stats').update({ xp: userData.xp }).eq('id', currentUser.id);
+            }
+            showToast(`+${earned} XP!`); updateUI();
+        }
+
+        async function deleteHabit(e, id) {
             e.stopPropagation();
-            const hRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'habits', id);
-            await deleteDoc(hRef);
-            showToast("Misi dihapus.");
-        };
+            if (isGuest) { habits = habits.filter(x => x.id !== id); saveLocal(); }
+            else { await sb.from('habits').delete().eq('id', id); habits = habits.filter(x => x.id !== id); }
+            updateUI();
+        }
 
-        window.saveReflection = async () => {
+        async function saveReflection() {
             const text = document.getElementById('ref-input').value.trim();
             if (!text) return;
-            const refCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'reflections');
-            await addDoc(refCol, { text, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }), createdAt: serverTimestamp() });
-            
-            const pRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
-            await updateDoc(pRef, { xp: profile.xp + 100 });
-            document.getElementById('ref-input').value = '';
-            showToast("+100 XP! Refleksi disimpan.");
-        };
+            const r = { text, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) };
+            userData.xp += 100;
+            if (isGuest) { reflections.unshift(r); saveLocal(); }
+            else {
+                const { data } = await sb.from('reflections').insert([{ ...r, user_id: currentUser.id }]).select();
+                await sb.from('user_stats').update({ xp: userData.xp }).eq('id', currentUser.id);
+                reflections.unshift(data[0]);
+            }
+            document.getElementById('ref-input').value = ''; showToast("+100 XP!"); renderReflections(); updateUI();
+        }
 
-        window.setTheme = async (idx) => {
-            const pRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
-            await updateDoc(pRef, { theme: idx });
-        };
+        function saveLocal() {
+            localStorage.setItem('ht_xp_v52', userData.xp);
+            localStorage.setItem('ht_theme_v52', userData.theme);
+            localStorage.setItem('ht_habits_v52', JSON.stringify(habits));
+            localStorage.setItem('ht_refs_v52', JSON.stringify(reflections));
+        }
 
-        // --- UI RENDERING ---
         function updateUI() {
-            const level = Math.floor(profile.xp / 1000) + 1;
-            const progress = (profile.xp % 1000) / 10;
-            const rank = [...RANKS].reverse().find(r => profile.xp >= r.min).name;
-
-            document.querySelectorAll('.xp-val').forEach(el => el.innerText = `${profile.xp.toLocaleString()} XP`);
+            document.getElementById('display-name').innerText = userData.name;
+            const level = Math.floor(userData.xp / 1000) + 1;
+            document.querySelectorAll('.xp-val').forEach(el => el.innerText = `${userData.xp} XP`);
             document.querySelectorAll('.level-val').forEach(el => el.innerText = level);
-            document.querySelectorAll('.xp-bar-main').forEach(el => el.style.width = `${progress}%`);
-            document.getElementById('rank-name').innerText = rank;
-            document.getElementById('display-name').innerText = profile.name || "Pejuang";
-            document.getElementById('date-display').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
-            renderThemeOptions();
+            document.getElementById('xp-bar-main').style.width = `${(userData.xp % 1000) / 10}%`;
+            document.getElementById('rank-name').innerText = userData.xp >= 1500 ? "Daily Warrior" : userData.xp >= 500 ? "Apprentice" : "Newbie";
+            renderHabits(); renderReflections(); lucide.createIcons();
         }
 
         function renderHabits() {
-            const activeList = document.getElementById('habit-list-active');
-            const doneList = document.getElementById('habit-list-done');
-            activeList.innerHTML = ''; doneList.innerHTML = '';
-
-            const actives = habits.filter(h => !h.done);
-            const dones = habits.filter(h => h.done);
-
-            if (!actives.length) activeList.innerHTML = `<div class="p-12 text-center opacity-20 italic text-sm border-2 border-dashed border-white/10 rounded-[2.5rem]">Semua target selesai! ✨</div>`;
-
-            actives.forEach(h => activeList.appendChild(createHabitElement(h)));
-            dones.forEach(h => doneList.appendChild(createHabitElement(h)));
-            lucide.createIcons();
-        }
-
-        function createHabitElement(h) {
-            const div = document.createElement('div');
-            div.className = `habit-card glass p-6 rounded-[2.5rem] flex items-center justify-between group cursor-pointer ${h.done ? 'done' : ''}`;
-            div.onclick = () => window.toggleHabit(h.id);
-            div.innerHTML = `
-                <div class="flex items-center gap-5">
-                    <div class="w-11 h-11 rounded-2xl border-2 flex items-center justify-center transition-all ${h.done ? 'bg-accent border-accent text-white shadow-lg' : 'border-current opacity-10'}">
-                        ${h.done ? '<i data-lucide="check" class="w-6 h-6"></i>' : ''}
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                             <h4 class="font-bold text-base leading-tight">${h.name}</h4>
-                             <span class="difficulty-chip diff-${h.difficulty}">${h.difficulty}</span>
-                        </div>
-                        <p class="text-[9px] font-black uppercase opacity-30 mt-1 tracking-widest">${h.streak} Hari Beruntun</p>
-                    </div>
-                </div>
-                <button onclick="window.deleteHabit(event, '${h.id}')" class="p-2 text-rose-500 opacity-0 group-hover:opacity-100 transition-all">
-                    <i data-lucide="trash-2" class="w-5 h-5"></i>
-                </button>
-            `;
-            return div;
-        }
-
-        function renderReflections(refs) {
-            const container = document.getElementById('ref-history');
-            container.innerHTML = refs.length ? '' : `<p class="text-center opacity-20 text-[10px] py-12 italic">Belum ada catatan hari ini.</p>`;
-            refs.slice(0, 5).forEach(r => {
+            const list = document.getElementById('habit-list-active');
+            list.innerHTML = habits.length ? '' : '<p class="opacity-20 text-center py-10">Tidak ada misi.</p>';
+            habits.forEach(h => {
                 const div = document.createElement('div');
-                div.className = 'glass p-6 rounded-[2rem] opacity-70 hover:opacity-100 transition-opacity';
-                div.innerHTML = `<p class="text-sm italic mb-2">"${r.text}"</p><p class="text-[8px] font-black opacity-30 uppercase">${r.date}</p>`;
-                container.appendChild(div);
+                div.className = `habit-card glass p-6 rounded-[2.5rem] flex items-center justify-between cursor-pointer ${h.done ? 'done' : ''}`;
+                div.onclick = () => toggleHabit(h.id);
+                div.innerHTML = `<div class="flex items-center gap-5"><div class="w-10 h-10 rounded-xl border-2 flex items-center justify-center ${h.done ? 'bg-accent border-accent text-white' : 'opacity-10'}">${h.done ? '<i data-lucide="check"></i>' : ''}</div><div><div class="flex items-center gap-2"><h4 class="font-bold">${h.name}</h4><span class="difficulty-chip diff-${h.difficulty}">${h.difficulty}</span></div><p class="text-[8px] opacity-30 uppercase">${h.streak} Hari</p></div></div><button onclick="deleteHabit(event, ${h.id})" class="p-2 text-rose-500 opacity-0 group-hover:opacity-100"><i data-lucide="trash-2"></i></button>`;
+                list.appendChild(div);
             });
-            lucide.createIcons();
         }
 
-        function renderThemeOptions() {
-            const container = document.getElementById('theme-options');
-            const themes = [
-                { id: 'dark', name: 'Midnight', color: '#6366f1' },
-                { id: 'nature', name: 'Greenery', color: '#10b981' },
-                { id: 'garnet', name: 'Garnet', color: '#ef4444' },
-                { id: 'light', name: 'Zenith', color: '#4f46e5' }
-            ];
-            container.innerHTML = themes.map((t, idx) => `
-                <button onclick="window.setTheme(${idx})" class="p-5 rounded-3xl border transition-all flex items-center justify-between group ${profile.theme === idx ? 'border-accent bg-accent/10' : 'border-white/10 hover:bg-white/5'}">
-                    <div class="flex items-center gap-4">
-                        <div class="w-7 h-7 rounded-full" style="background:${t.color}"></div>
-                        <span class="font-bold text-sm ${profile.theme === idx ? 'text-accent' : ''}">${t.name}</span>
-                    </div>
-                    ${profile.theme === idx ? '<span class="text-[8px] font-black uppercase bg-accent text-white px-3 py-1.5 rounded-full shadow-lg">Aktif</span>' : ''}
-                </button>
-            `).join('');
-            lucide.createIcons();
+        function renderReflections() {
+            const list = document.getElementById('ref-history');
+            list.innerHTML = '';
+            reflections.slice(0, 5).forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'glass p-6 rounded-[2rem] opacity-70';
+                div.innerHTML = `<p class="text-sm italic mb-2">"${r.text}"</p><p class="text-[8px] uppercase opacity-30">${r.date}</p>`;
+                list.appendChild(div);
+            });
+        }
+
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            document.querySelectorAll('nav button, .md\\:hidden button').forEach(b => { b.classList.remove('text-accent', 'bg-white/5', 'opacity-100'); b.classList.add('opacity-30', 'opacity-20'); });
+            const navBtn = document.getElementById('nav-' + id); if (navBtn) navBtn.classList.replace('opacity-30', 'text-accent');
+            const mNavBtn = document.getElementById('m-nav-' + id); if (mNavBtn) mNavBtn.classList.replace('opacity-20', 'text-accent');
+            if (id === 'planner') setEnergy('med');
+        }
+
+        function setEnergy(level) {
+            document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active-energy'));
+            document.getElementById('e-' + level).classList.add('active-energy');
+            const tasks = { low: ["Meditasi (5m)", "Minum Air"], med: ["Baca 5 Hal", "Jalan 10m"], high: ["Olahraga 20m", "Deep Work"] };
+            document.getElementById('planner-tasks').innerHTML = tasks[level].map(t => `<div class="glass p-6 rounded-[2rem] border-l-4 border-accent font-bold">${t}</div>`).join('');
         }
 
         function applyTheme() {
-            const themes = [
-                { id: 'dark', color: '#6366f1' },
-                { id: 'nature', color: '#10b981' },
-                { id: 'garnet', color: '#ef4444' },
-                { id: 'light', color: '#4f46e5' }
-            ];
-            const theme = themes[profile.theme] || themes[0];
-            document.body.setAttribute('data-theme', theme.id);
-            document.documentElement.style.setProperty('--primary', theme.color);
+            const t = themes[userData.theme];
+            document.body.setAttribute('data-theme', t.id);
+            document.documentElement.style.setProperty('--primary', t.color);
+            renderThemeOptions();
         }
 
-        // --- GLOBAL UI CONTROLS ---
-        window.showTab = (id) => {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + id).classList.add('active');
-            
-            document.querySelectorAll('.nav-btn, .mobile-nav').forEach(n => {
-                n?.classList?.remove('text-accent', 'bg-white/5', 'nav-active', 'opacity-100');
-                n?.classList?.add('opacity-30');
-            });
+        function renderThemeOptions() {
+            document.getElementById('theme-options').innerHTML = themes.map((t, i) => `<button onclick="setTheme(${i})" class="p-5 rounded-3xl border ${userData.theme === i ? 'border-accent bg-accent/10' : 'border-white/10'} flex items-center justify-between"><div class="flex items-center gap-4"><div class="w-6 h-6 rounded-full" style="background:${t.color}"></div><span class="font-bold text-sm">${t.name}</span></div></button>`).join('');
+        }
 
-            document.getElementById('nav-' + id)?.classList.add('text-accent', 'bg-white/5', 'nav-active');
-            document.getElementById('nav-' + id)?.classList.remove('opacity-30');
-            document.getElementById('m-nav-' + id)?.classList.add('text-accent', 'bg-white/5', 'opacity-100');
-            document.getElementById('m-nav-' + id)?.classList.remove('opacity-30');
+        async function setTheme(i) {
+            userData.theme = i; applyTheme();
+            if (isGuest) saveLocal();
+            else await sb.from('user_stats').update({ theme: i }).eq('id', currentUser.id);
+        }
 
-            if(id === 'planner') window.setEnergy('med');
-        };
+        function logout() { localStorage.clear(); sb.auth.signOut().then(() => location.reload()); }
+        function openModal() { document.getElementById('modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        function toggleThemePicker() { const el = document.getElementById('theme-picker'); el.style.display = el.style.display === 'flex' ? 'none' : 'flex'; }
+        function setDiff(d) { currentDiff = d; document.querySelectorAll('#modal button[id^="d-"]').forEach(b => { b.className = "flex-1 py-3 rounded-xl text-[9px] font-black uppercase"; }); document.getElementById('d-' + d).className += " border-2 border-accent bg-accent/10 text-accent"; }
+        function showToast(msg) { const t = document.createElement('div'); t.className = 'fixed top-10 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-full z-[2000] font-black italic text-[10px] uppercase'; t.innerHTML = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2500); }
 
-        window.setEnergy = (level) => {
-            document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active-energy'));
-            document.getElementById('e-' + level).classList.add('active-energy');
-            const tasks = {
-                low: ["Meditasi Napas (5 menit)", "Minum segelas air dingin", "Peregangan otot ringan"],
-                med: ["Membaca 5 halaman buku", "Berjalan kaki 10 menit", "Merapikan meja kerja"],
-                high: ["Olahraga Intens 20 menit", "Fokus mendalam 45 menit", "Belajar skill baru"]
-            };
-            const container = document.getElementById('planner-tasks');
-            container.innerHTML = tasks[level].map((t, i) => `<div class="glass p-6 rounded-[2rem] border-l-4 border-accent text-xs font-bold animate-in slide-in-from-bottom duration-300" style="animation-delay: ${i*50}ms">${t}</div>`).join('');
-        };
-
-        window.showToast = (msg) => {
-            const t = document.createElement('div');
-            t.className = 'fixed top-10 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-full z-[2000] shadow-2xl font-black italic text-[10px] uppercase tracking-widest animate-in slide-in-from-top duration-300';
-            t.innerHTML = `<span class="text-accent mr-2">✦</span> ${msg}`;
-            document.body.appendChild(t);
-            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.remove(), 500); }, 2500);
-        };
-
-        window.setDiff = (d) => {
-            currentDiff = d;
-            document.querySelectorAll('.diff-btn').forEach(b => {
-                b.className = 'diff-btn flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all opacity-40';
-            });
-            document.getElementById('d-' + d).className = 'diff-btn flex-1 py-3 rounded-xl border-2 border-accent text-[9px] font-black uppercase bg-accent/10 text-accent transition-all';
-        };
-
-        window.toggleThemePicker = () => {
-            const el = document.getElementById('theme-picker');
-            el.classList.toggle('hidden'); el.classList.toggle('flex');
-        };
-
-        window.openModal = () => { document.getElementById('modal').classList.remove('hidden'); document.getElementById('modal').classList.add('flex'); };
-        window.closeModal = () => { document.getElementById('modal').classList.add('hidden'); document.getElementById('modal').classList.remove('flex'); };
-
-        initAuth();
+        window.onload = checkSession;
     </script>
 </body>
 </html>
-
