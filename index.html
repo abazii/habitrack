@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HABITrack - Pro v5.2</title>
+    <title>HABITrack - Pro v6.0 Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -28,7 +28,7 @@
             --glass: rgba(255, 255, 255, 0.9); 
             --glass-border: rgba(0, 0, 0, 0.08);
             --orb-opacity: 0.12;
-            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         [data-theme="garnet"] {
@@ -39,7 +39,6 @@
             --glass: rgba(255, 255, 255, 0.04);
             --glass-border: rgba(239, 68, 68, 0.2);
             --orb-opacity: 0.25;
-            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
         }
 
         [data-theme="nature"] {
@@ -50,7 +49,6 @@
             --glass: rgba(255, 255, 255, 0.04);
             --glass-border: rgba(16, 185, 129, 0.2);
             --orb-opacity: 0.25;
-            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
         }
 
         body {
@@ -66,7 +64,6 @@
         .bg-accent { background-color: var(--primary); }
         
         [data-theme="light"] .bg-accent { color: #ffffff !important; }
-        [data-theme="light"] .nav-active { background: rgba(79, 70, 229, 0.1); color: var(--primary); }
 
         .glass {
             background: var(--glass);
@@ -90,7 +87,6 @@
             filter: blur(100px);
             opacity: var(--orb-opacity);
             animation: morph 20s infinite alternate linear;
-            transition: background-color 0.8s ease;
         }
 
         .orb-1 { background: var(--primary); top: -20%; left: -20%; }
@@ -102,7 +98,7 @@
         }
 
         .habit-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .habit-card.done { transform: scale(0.95); opacity: 0.6; filter: grayscale(100%); }
+        .habit-card.done { transform: scale(0.95); opacity: 0.6; filter: grayscale(100%); pointer-events: none; }
 
         .energy-btn { opacity: 0.4; transition: all 0.3s ease; }
         .energy-btn.active-energy {
@@ -118,15 +114,12 @@
             border-radius: 99px;
             text-transform: uppercase;
             font-weight: 800;
-            letter-spacing: 0.05em;
         }
 
         .diff-easy { background: rgba(16, 185, 129, 0.15); color: #10b981; }
         .diff-medium { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
         .diff-hard { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: slideUp 0.4s ease-out; }
 
@@ -135,56 +128,83 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        #theme-picker, #modal, #onboarding {
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: #030712;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .sync-badge {
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            padding: 4px 10px;
+            border-radius: 99px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
     </style>
 </head>
 <body data-theme="dark">
+
+    <div id="loading-overlay" class="loading-screen">
+        <img src="1774532838452.png" alt="Logo" class="h-16 w-16 animate-pulse object-contain">
+        <p class="text-[10px] font-black uppercase tracking-[0.5em] opacity-50">Menyambungkan Awan...</p>
+    </div>
 
     <div class="liquid-container">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
     </div>
 
-    <!-- ONBOARDING OVERLAY -->
-    <div id="onboarding" class="fixed inset-0 z-[1000] flex items-center justify-center p-6 hidden">
-        <div class="glass w-full max-w-md p-10 rounded-[3.5rem] text-center space-y-8 animate-in zoom-in-95 duration-300">
+    <!-- ONBOARDING -->
+    <div id="onboarding" class="fixed inset-0 z-[1000] flex items-center justify-center p-6 hidden bg-black/80 backdrop-blur-xl">
+        <div class="glass w-full max-w-md p-10 rounded-[3.5rem] text-center space-y-8">
             <img src="1774532838452.png" alt="Logo" class="h-20 w-20 mx-auto object-contain">
-            <h2 class="text-3xl md:text-4xl font-black italic tracking-tighter">Siapa namamu, <span class="text-accent">Pejuang?</span></h2>
-            <input id="user-name-input" type="text" placeholder="Ketik nama di sini..." class="w-full bg-white/5 border-2 border-white/10 rounded-3xl p-6 text-xl font-bold text-center outline-none focus:border-accent transition-all">
+            <h2 class="text-3xl font-black italic tracking-tighter">Halo, <span class="text-accent">Pejuang Baru!</span></h2>
+            <input id="user-name-input" type="text" placeholder="Masukkan namamu..." class="w-full bg-white/5 border-2 border-white/10 rounded-3xl p-6 text-xl font-bold text-center outline-none focus:border-accent">
             <button onclick="saveInitialName()" class="w-full py-6 bg-accent rounded-3xl text-white font-black text-xl shadow-xl active:scale-95 transition-all">Mulai Petualangan</button>
         </div>
     </div>
 
     <div class="flex flex-col md:flex-row h-screen overflow-hidden">
         
-        <!-- SIDEBAR (DESKTOP) -->
+        <!-- SIDEBAR -->
         <aside class="hidden md:flex w-72 flex-col glass m-6 rounded-[2.5rem] p-8 z-50">
-            <div class="mb-12 flex items-center gap-4">
+            <div class="mb-10 flex items-center gap-4">
                 <img src="1774532838452.png" alt="Logo" class="h-10 w-10 object-contain">
                 <div>
                     <h1 class="text-xl font-black italic tracking-tighter leading-none">HABIT<span class="text-accent">rack</span></h1>
-                    <p class="text-[7px] font-bold opacity-30 uppercase tracking-[0.4em] mt-1.5">v5.2 Pro Edition</p>
+                    <p class="text-[7px] font-bold opacity-30 uppercase tracking-[0.4em] mt-1.5">v6.0 Cloud Pro</p>
                 </div>
             </div>
             
-            <div onclick="toggleThemePicker()" class="glass rounded-[2rem] p-5 mb-10 cursor-pointer hover:scale-[1.02] transition-all">
+            <div onclick="toggleThemePicker()" class="glass rounded-[2rem] p-5 mb-8 cursor-pointer hover:scale-[1.02] transition-all">
                 <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent">
+                    <div class="w-12 h-12 rounded-2xl bg-accent/20 flex items-center justify-center text-accent shadow-inner">
                         <i data-lucide="award" class="w-6 h-6"></i>
                     </div>
                     <div class="flex-1 overflow-hidden">
-                        <p id="rank-name" class="text-[8px] font-black opacity-40 uppercase tracking-widest truncate">Newbie Runner</p>
+                        <p id="rank-name" class="text-[8px] font-black opacity-40 uppercase tracking-widest truncate">Memuat...</p>
                         <p class="xp-val font-bold text-base text-accent leading-none">0 XP</p>
                     </div>
                 </div>
                 <div class="h-1.5 w-full bg-black/10 rounded-full overflow-hidden mb-2">
                     <div class="xp-bar-main h-full bg-accent rounded-full transition-all duration-700" style="width: 0%"></div>
                 </div>
-                <p class="text-[7px] opacity-40 font-bold text-right uppercase">Lvl <span class="level-val">1</span></p>
+                <div class="flex justify-between items-center">
+                    <div class="sync-badge"><i data-lucide="cloud-check" class="w-2.5 h-2.5"></i> Cloud Synced</div>
+                    <p class="text-[7px] opacity-40 font-bold uppercase">Lvl <span class="level-val">1</span></p>
+                </div>
             </div>
 
             <nav class="space-y-2 flex-1">
@@ -195,56 +215,45 @@
                     <i data-lucide="zap" class="w-5 h-5"></i> Planner
                 </button>
                 <button onclick="showTab('reflection')" id="nav-reflection" class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold opacity-30 hover:opacity-100 transition-all">
-                    <i data-lucide="leaf" class="w-5 h-5"></i> Reflection
+                    <i data-lucide="leaf" class="w-5 h-5"></i> Refleksi
                 </button>
             </nav>
+
+            <div class="mt-auto pt-6 border-t border-white/5 opacity-20 hover:opacity-100 transition-opacity">
+                <p class="text-[7px] font-black uppercase tracking-widest mb-1">User ID:</p>
+                <p id="display-uid" class="text-[8px] font-mono break-all leading-tight">Authenticating...</p>
+            </div>
         </aside>
 
         <!-- MAIN VIEWPORT -->
         <div id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar relative z-10">
-            
-            <!-- HEADER MOBILE -->
             <header class="sticky top-0 z-[100] px-6 py-6 flex justify-between items-center md:hidden bg-transparent">
                 <div class="flex items-center gap-3">
                     <img src="1774532838452.png" alt="Logo" class="h-8 w-8 object-contain">
                     <h1 class="text-xl font-black italic tracking-tighter">HABITrack</h1>
                 </div>
-                <button onclick="toggleThemePicker()" class="glass w-10 h-10 rounded-xl flex items-center justify-center text-accent active:scale-90 transition-all">
+                <button onclick="toggleThemePicker()" class="glass w-10 h-10 rounded-xl flex items-center justify-center text-accent active:scale-90 transition-all shadow-lg">
                     <i data-lucide="palette" class="w-5 h-5"></i>
                 </button>
             </header>
 
             <div class="max-w-4xl mx-auto px-6 md:px-12 pb-40 space-y-12 md:pt-16">
-                
-                <!-- GREETING -->
                 <section>
                     <h2 class="text-4xl md:text-7xl font-black tracking-tighter italic leading-none">
                         Halo, <span id="display-name" class="text-accent underline decoration-4 underline-offset-8">Pejuang</span>!
                     </h2>
                     <div class="flex items-center gap-3 mt-6 opacity-40">
                         <i data-lucide="calendar" class="w-4 h-4"></i>
-                        <p id="date-display" class="text-[10px] font-bold uppercase tracking-[0.2em]">Memuat Tanggal...</p>
+                        <p id="date-display" class="text-[10px] font-bold uppercase tracking-[0.2em]">Memuat...</p>
                     </div>
                 </section>
 
-                <!-- TAB: HOME -->
-                <div id="tab-home" class="tab-content active space-y-8">
-                    <div class="md:hidden glass p-6 rounded-[2.5rem] flex items-center justify-between">
-                        <div class="space-y-1">
-                            <p class="text-[9px] font-black opacity-30 uppercase tracking-widest">Peringkat</p>
-                            <p id="mobile-rank" class="text-sm font-bold italic">Newbie Runner</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="xp-val text-xl font-black text-accent">0 XP</p>
-                            <p class="text-[8px] opacity-30 font-bold uppercase">Level <span class="level-val">1</span></p>
-                        </div>
-                    </div>
-
+                <div id="tab-home" class="tab-content active space-y-10">
                     <div class="space-y-4">
                         <div class="flex justify-between items-center px-2">
                             <div>
                                 <h3 class="text-xl font-black italic uppercase tracking-widest opacity-40">Misi Aktif</h3>
-                                <p class="text-[10px] opacity-30 font-bold uppercase mt-1">Tekan jika sudah selesai</p>
+                                <p class="text-[10px] opacity-30 font-bold uppercase mt-1">Selesaikan satu persatu</p>
                             </div>
                             <button onclick="openModal()" class="w-14 h-14 bg-accent rounded-2xl flex items-center justify-center text-white shadow-xl hover:scale-105 active:scale-90 transition-all">
                                 <i data-lucide="plus" class="w-7 h-7"></i>
@@ -256,13 +265,13 @@
                     <div class="space-y-4 pt-6">
                         <div class="flex items-center gap-3 px-2">
                             <i data-lucide="check-circle" class="w-4 h-4 opacity-20"></i>
-                            <h3 class="text-xs font-black italic uppercase tracking-widest opacity-20">Berhasil Diselesaikan</h3>
+                            <h3 class="text-xs font-black italic uppercase tracking-widest opacity-20">Selesai Hari Ini</h3>
                         </div>
                         <div id="habit-list-done" class="flex flex-col gap-3"></div>
                     </div>
                 </div>
 
-                <!-- TAB: PLANNER -->
+                <!-- PLANNER -->
                 <div id="tab-planner" class="tab-content space-y-10">
                     <div class="text-center space-y-2">
                         <h3 class="text-3xl font-black italic uppercase tracking-tighter">Vibe Check ⚡</h3>
@@ -285,7 +294,7 @@
                     <div id="planner-tasks" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4"></div>
                 </div>
 
-                <!-- TAB: REFLECTION -->
+                <!-- REFLECTION -->
                 <div id="tab-reflection" class="tab-content space-y-8">
                     <div class="glass p-8 md:p-12 rounded-[3.5rem] space-y-8">
                         <div class="text-center">
@@ -297,7 +306,6 @@
                     </div>
                     <div id="ref-history" class="space-y-4"></div>
                 </div>
-
             </div>
         </div>
 
@@ -316,68 +324,56 @@
     </div>
 
     <!-- THEME PICKER -->
-    <div id="theme-picker" class="fixed inset-0 z-[500] hidden items-center justify-center p-6">
+    <div id="theme-picker" class="fixed inset-0 z-[500] hidden items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
         <div class="glass w-full max-w-sm p-10 rounded-[3.5rem] relative animate-in zoom-in-95 duration-200">
             <button onclick="toggleThemePicker()" class="absolute top-8 right-8 opacity-40 hover:opacity-100 transition-opacity"><i data-lucide="x"></i></button>
-            <h3 class="font-black italic text-2xl mb-8 tracking-tight">Kustomisasi Tema 🎨</h3>
-            <div id="theme-options" class="grid grid-cols-1 gap-3 mb-6"></div>
-            <div class="pt-4 border-t border-white/10">
-                <p class="text-[9px] font-black uppercase opacity-30 text-center tracking-widest">Diterapkan secara otomatis</p>
-            </div>
+            <h3 class="font-black italic text-2xl mb-8">Ubah Vibe 🎨</h3>
+            <div id="theme-options" class="grid grid-cols-1 gap-3"></div>
         </div>
     </div>
 
-    <!-- MODAL ADD HABIT -->
-    <div id="modal" class="fixed inset-0 z-[600] hidden items-center justify-center p-6">
+    <!-- MODAL -->
+    <div id="modal" class="fixed inset-0 z-[600] hidden items-center justify-center p-6 bg-black/60 backdrop-blur-xl">
         <div class="glass w-full max-w-md p-10 rounded-[3.5rem] animate-in zoom-in-95 duration-200">
-            <h3 class="text-3xl font-black italic mb-8 tracking-tighter text-center">Buat Target 🎯</h3>
-            
+            <h3 class="text-3xl font-black italic mb-8 text-center">Buat Target 🎯</h3>
             <div class="space-y-6">
                 <div>
                     <label class="text-[10px] font-black uppercase opacity-40 ml-4 mb-2 block">Nama Habit</label>
-                    <input id="h-input" type="text" placeholder="Misal: Lari Pagi 15 Menit" class="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-lg font-bold outline-none text-current focus:border-accent transition-all">
+                    <input id="h-input" type="text" placeholder="Misal: Minum air 2L" class="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-lg font-bold outline-none text-current focus:border-accent">
                 </div>
-
                 <div>
-                    <label class="text-[10px] font-black uppercase opacity-40 ml-4 mb-2 block">Tingkat Kesulitan</label>
+                    <label class="text-[10px] font-black uppercase opacity-40 ml-4 mb-2 block">Kesulitan</label>
                     <div class="flex gap-2 p-1.5 glass rounded-2xl">
-                        <button onclick="setDiff('easy')" id="d-easy" class="diff-btn flex-1 py-3 rounded-xl border border-transparent text-[9px] font-black uppercase transition-all">Easy</button>
+                        <button onclick="setDiff('easy')" id="d-easy" class="diff-btn flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all">Easy</button>
                         <button onclick="setDiff('medium')" id="d-medium" class="diff-btn flex-1 py-3 rounded-xl border-2 border-accent text-[9px] font-black uppercase bg-accent/10 text-accent transition-all">Med</button>
-                        <button onclick="setDiff('hard')" id="d-hard" class="diff-btn flex-1 py-3 rounded-xl border border-transparent text-[9px] font-black uppercase transition-all">Hard</button>
+                        <button onclick="setDiff('hard')" id="d-hard" class="diff-btn flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all">Hard</button>
                     </div>
                 </div>
-
                 <div class="flex gap-4 pt-6">
                     <button onclick="closeModal()" class="flex-1 py-5 font-bold opacity-40">Batal</button>
-                    <button onclick="addHabit()" class="flex-[2] py-5 rounded-3xl bg-accent text-white font-black text-xl shadow-xl active:scale-95 transition-all">Mulai Misi</button>
+                    <button onclick="addHabit()" class="flex-[2] py-5 rounded-3xl bg-accent text-white font-black text-xl shadow-xl active:scale-95 transition-all">Mulai</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // --- DATA STATE ---
-        let userData = {
-            name: localStorage.getItem('ht_name_v52') || "",
-            xp: parseInt(localStorage.getItem('ht_xp_v52')) || 0,
-            theme: parseInt(localStorage.getItem('ht_theme_v52')) || 0,
-            lastLogin: localStorage.getItem('ht_last_login_v52') || new Date().toDateString()
-        };
+    <!-- FIREBASE INTEGRATION -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, query, addDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        let habits = JSON.parse(localStorage.getItem('ht_habits_v52')) || [
-            { id: 1, name: 'Minum air putih 2L', done: false, streak: 5, difficulty: 'easy' },
-            { id: 2, name: 'Membaca buku 10 menit', done: false, streak: 3, difficulty: 'medium' }
-        ];
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'habitrack-pro-v6';
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        let reflections = JSON.parse(localStorage.getItem('ht_refs_v52')) || [];
+        let currentUser = null;
+        let habits = [];
+        let profile = { name: '', xp: 0, theme: 0, lastLogin: '' };
         let currentDiff = 'medium';
-
-        const themes = [
-            { id: 'dark', name: 'Midnight', color: '#6366f1' },
-            { id: 'nature', name: 'Greenery', color: '#10b981' },
-            { id: 'garnet', name: 'Garnet', color: '#ef4444' },
-            { id: 'light', name: 'Zenith', color: '#4f46e5' }
-        ];
 
         const XP_MAP = { easy: 20, medium: 50, hard: 100 };
         const RANKS = [
@@ -385,63 +381,165 @@
             { min: 500, name: "Habit Apprentice" },
             { min: 1500, name: "Daily Warrior" },
             { min: 3000, name: "Consistency King" },
-            { min: 6000, name: "Habit Master" }
+            { min: 8000, name: "Habit Master" }
         ];
 
-        // --- CORE FUNCTIONS ---
-        function checkDailyReset() {
-            const today = new Date().toDateString();
-            if (userData.lastLogin !== today) {
-                habits.forEach(h => { if (!h.done) h.streak = 0; h.done = false; });
-                userData.lastLogin = today;
-                save();
+        // --- AUTH FLOW ---
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth failed:", err);
+                showToast("Gagal menyambungkan ke awan.");
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('display-uid').innerText = user.uid;
+                await initDataListeners();
+                document.getElementById('loading-overlay').style.display = 'none';
+            }
+        });
+
+        // --- CLOUD SYNC LOGIC ---
+        async function initDataListeners() {
+            if (!currentUser) return;
+
+            // 1. Profile Listener
+            const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
+            onSnapshot(profileRef, (snap) => {
+                if (snap.exists()) {
+                    profile = snap.data();
+                    const today = new Date().toDateString();
+                    if (profile.lastLogin !== today) resetDailyHabits(today);
+                    updateUI();
+                    applyTheme();
+                } else {
+                    document.getElementById('onboarding').style.display = 'flex';
+                }
+            });
+
+            // 2. Habits Listener
+            const habitCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'habits');
+            onSnapshot(habitCol, (snap) => {
+                habits = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderHabits();
+            });
+
+            // 3. Reflections Listener
+            const refCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'reflections');
+            onSnapshot(refCol, (snap) => {
+                const refs = snap.docs.map(d => d.data());
+                renderReflections(refs);
+            });
+        }
+
+        async function resetDailyHabits(today) {
+            profile.lastLogin = today;
+            await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main'), { lastLogin: today });
+            for (const h of habits) {
+                const hRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'habits', h.id);
+                if (!h.done) await updateDoc(hRef, { streak: 0 });
+                await updateDoc(hRef, { done: false });
             }
         }
 
-        function save() {
-            localStorage.setItem('ht_name_v52', userData.name);
-            localStorage.setItem('ht_xp_v52', userData.xp);
-            localStorage.setItem('ht_theme_v52', userData.theme);
-            localStorage.setItem('ht_last_login_v52', userData.lastLogin);
-            localStorage.setItem('ht_habits_v52', JSON.stringify(habits));
-            localStorage.setItem('ht_refs_v52', JSON.stringify(reflections));
-        }
+        // --- ACTION EXPORTS ---
+        window.saveInitialName = async () => {
+            const name = document.getElementById('user-name-input').value.trim();
+            if (!name) return;
+            const ref = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
+            await setDoc(ref, { name, xp: 0, theme: 0, lastLogin: new Date().toDateString() });
+            document.getElementById('onboarding').style.display = 'none';
+        };
 
-        function updateStats() {
-            const level = Math.floor(userData.xp / 1000) + 1;
-            const progress = (userData.xp % 1000) / 10;
-            const rank = [...RANKS].reverse().find(r => userData.xp >= r.min).name;
+        window.toggleHabit = async (id) => {
+            const h = habits.find(x => x.id === id);
+            if (h && !h.done) {
+                const hRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'habits', id);
+                await updateDoc(hRef, { done: true, streak: h.streak + 1 });
+                
+                const earnedXP = XP_MAP[h.difficulty] || 50;
+                const pRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
+                await updateDoc(pRef, { xp: profile.xp + earnedXP });
+                showToast(`+${earnedXP} XP! Terus konsisten.`);
+            }
+        };
 
-            document.querySelectorAll('.xp-val').forEach(el => el.innerText = `${userData.xp.toLocaleString()} XP`);
+        window.addHabit = async () => {
+            const name = document.getElementById('h-input').value.trim();
+            if (!name) return;
+            const hCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'habits');
+            await addDoc(hCol, { name, done: false, streak: 0, difficulty: currentDiff, createdAt: serverTimestamp() });
+            document.getElementById('h-input').value = '';
+            closeModal();
+            showToast("Misi baru ditambahkan!");
+        };
+
+        window.deleteHabit = async (e, id) => {
+            e.stopPropagation();
+            const hRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'habits', id);
+            await deleteDoc(hRef);
+            showToast("Misi dihapus.");
+        };
+
+        window.saveReflection = async () => {
+            const text = document.getElementById('ref-input').value.trim();
+            if (!text) return;
+            const refCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'reflections');
+            await addDoc(refCol, { text, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }), createdAt: serverTimestamp() });
+            
+            const pRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
+            await updateDoc(pRef, { xp: profile.xp + 100 });
+            document.getElementById('ref-input').value = '';
+            showToast("+100 XP! Refleksi disimpan.");
+        };
+
+        window.setTheme = async (idx) => {
+            const pRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
+            await updateDoc(pRef, { theme: idx });
+        };
+
+        // --- UI RENDERING ---
+        function updateUI() {
+            const level = Math.floor(profile.xp / 1000) + 1;
+            const progress = (profile.xp % 1000) / 10;
+            const rank = [...RANKS].reverse().find(r => profile.xp >= r.min).name;
+
+            document.querySelectorAll('.xp-val').forEach(el => el.innerText = `${profile.xp.toLocaleString()} XP`);
             document.querySelectorAll('.level-val').forEach(el => el.innerText = level);
             document.querySelectorAll('.xp-bar-main').forEach(el => el.style.width = `${progress}%`);
             document.getElementById('rank-name').innerText = rank;
-            document.getElementById('mobile-rank').innerText = rank;
-            document.getElementById('display-name').innerText = userData.name || "Pejuang";
+            document.getElementById('display-name').innerText = profile.name || "Pejuang";
+            document.getElementById('date-display').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+            renderThemeOptions();
         }
 
         function renderHabits() {
             const activeList = document.getElementById('habit-list-active');
             const doneList = document.getElementById('habit-list-done');
-            activeList.innerHTML = '';
-            doneList.innerHTML = '';
+            activeList.innerHTML = ''; doneList.innerHTML = '';
 
-            const activeHabits = habits.filter(h => !h.done);
-            const finishedHabits = habits.filter(h => h.done);
+            const actives = habits.filter(h => !h.done);
+            const dones = habits.filter(h => h.done);
 
-            if (activeHabits.length === 0) {
-                activeList.innerHTML = `<div class="p-12 text-center opacity-20 italic text-sm border-2 border-dashed border-white/10 rounded-[2.5rem] bg-white/5">Semua misi hari ini telah tercapai! ✨</div>`;
-            }
+            if (!actives.length) activeList.innerHTML = `<div class="p-12 text-center opacity-20 italic text-sm border-2 border-dashed border-white/10 rounded-[2.5rem]">Semua target selesai! ✨</div>`;
 
-            activeHabits.forEach(h => activeList.appendChild(createHabitElement(h)));
-            finishedHabits.forEach(h => doneList.appendChild(createHabitElement(h)));
+            actives.forEach(h => activeList.appendChild(createHabitElement(h)));
+            dones.forEach(h => doneList.appendChild(createHabitElement(h)));
             lucide.createIcons();
         }
 
         function createHabitElement(h) {
             const div = document.createElement('div');
-            div.className = `habit-card glass p-6 rounded-[2.5rem] flex items-center justify-between group cursor-pointer ${h.done ? 'done pointer-events-none' : ''}`;
-            div.onclick = () => toggleHabit(h.id);
+            div.className = `habit-card glass p-6 rounded-[2.5rem] flex items-center justify-between group cursor-pointer ${h.done ? 'done' : ''}`;
+            div.onclick = () => window.toggleHabit(h.id);
             div.innerHTML = `
                 <div class="flex items-center gap-5">
                     <div class="w-11 h-11 rounded-2xl border-2 flex items-center justify-center transition-all ${h.done ? 'bg-accent border-accent text-white shadow-lg' : 'border-current opacity-10'}">
@@ -449,201 +547,118 @@
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                             <h4 class="font-bold text-base md:text-lg leading-tight">${h.name}</h4>
+                             <h4 class="font-bold text-base leading-tight">${h.name}</h4>
                              <span class="difficulty-chip diff-${h.difficulty}">${h.difficulty}</span>
                         </div>
                         <p class="text-[9px] font-black uppercase opacity-30 mt-1 tracking-widest">${h.streak} Hari Beruntun</p>
                     </div>
                 </div>
-                <button onclick="deleteHabit(event, ${h.id})" class="p-2 text-rose-500 opacity-0 group-hover:opacity-100 active:scale-90 transition-all">
+                <button onclick="window.deleteHabit(event, '${h.id}')" class="p-2 text-rose-500 opacity-0 group-hover:opacity-100 transition-all">
                     <i data-lucide="trash-2" class="w-5 h-5"></i>
                 </button>
             `;
             return div;
         }
 
-        function toggleHabit(id) {
-            const h = habits.find(x => x.id === id);
-            if (h && !h.done) {
-                h.done = true;
-                h.streak++;
-                const earnedXP = XP_MAP[h.difficulty] || 50;
-                userData.xp += earnedXP;
-                showToast(`+${earnedXP} XP! Terus melangkah.`);
-                save();
-                renderHabits();
-                updateStats();
-            }
-        }
-
-        function deleteHabit(e, id) {
-            e.stopPropagation();
-            habits = habits.filter(x => x.id !== id);
-            save();
-            renderHabits();
-            showToast("Misi dihapus.");
-        }
-
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + id).classList.add('active');
-            
-            document.querySelectorAll('aside nav button').forEach(b => {
-                b.classList.remove('text-accent', 'bg-white/5', 'opacity-100', 'nav-active');
-                b.classList.add('opacity-30');
-            });
-            const dBtn = document.getElementById('nav-' + id);
-            if(dBtn) {
-                dBtn.classList.replace('opacity-30', 'text-accent');
-                dBtn.classList.add('bg-white/5', 'nav-active');
-            }
-
-            document.querySelectorAll('.md\\:hidden nav button').forEach(b => {
-                b.classList.remove('text-accent', 'bg-white/5', 'opacity-100');
-                b.classList.add('opacity-20');
-            });
-            const mBtn = document.getElementById('m-nav-' + id);
-            if(mBtn) {
-                mBtn.classList.remove('opacity-20');
-                mBtn.classList.add('text-accent', 'bg-white/5', 'opacity-100');
-            }
-
-            if(id === 'reflection') renderReflections();
-            if(id === 'planner') setEnergy('med');
-        }
-
-        function setEnergy(level) {
-            document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active-energy'));
-            document.getElementById('e-' + level).classList.add('active-energy');
-            const tasks = {
-                low: ["Meditasi Napas (5 menit)", "Minum segelas air dingin", "Peregangan otot ringan", "Jurnaling 1 kalimat"],
-                med: ["Membaca buku (5 halaman)", "Berjalan kaki 10 menit", "Merapikan meja kerja", "Planning hari esok"],
-                high: ["Olahraga Intens 20 menit", "Deep work 45 menit", "Mempelajari skill baru", "Deep cleaning kamar"]
-            };
-            const container = document.getElementById('planner-tasks');
-            container.innerHTML = tasks[level].map((t, i) => `
-                <div class="glass p-6 rounded-[2rem] border-l-4 border-accent text-xs font-bold animate-in slide-in-from-bottom duration-300 shadow-sm" style="animation-delay: ${i*50}ms">
-                    ${t}
-                </div>
-            `).join('');
-        }
-
-        function applyTheme() {
-            const theme = themes[userData.theme];
-            document.body.setAttribute('data-theme', theme.id);
-            document.documentElement.style.setProperty('--primary', theme.color);
-            save();
-            renderThemeOptions();
-        }
-
-        function renderThemeOptions() {
-            const container = document.getElementById('theme-options');
-            container.innerHTML = themes.map((t, idx) => `
-                <button onclick="setTheme(${idx})" class="p-5 rounded-3xl border transition-all flex items-center justify-between group ${userData.theme === idx ? 'border-accent bg-accent/10' : 'border-white/10 hover:bg-white/5'}">
-                    <div class="flex items-center gap-4">
-                        <div class="w-7 h-7 rounded-full shadow-inner" style="background:${t.color}"></div>
-                        <span class="font-bold text-sm ${userData.theme === idx ? 'text-accent' : ''}">${t.name}</span>
-                    </div>
-                    ${userData.theme === idx ? 
-                        '<span class="text-[8px] font-black uppercase bg-accent text-white px-3 py-1.5 rounded-full">Aktif</span>' : 
-                        '<i data-lucide="circle" class="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity"></i>'}
-                </button>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        function setTheme(idx) {
-            userData.theme = idx;
-            applyTheme();
-            showToast(`Tema ${themes[idx].name} aktif`);
-        }
-
-        function toggleThemePicker() {
-            const el = document.getElementById('theme-picker');
-            el.classList.toggle('hidden');
-            el.classList.toggle('flex');
-        }
-
-        function saveInitialName() {
-            const val = document.getElementById('user-name-input').value.trim();
-            if (val) {
-                userData.name = val;
-                save();
-                document.getElementById('onboarding').style.display = 'none';
-                updateStats();
-                showToast(`Selamat datang, ${val}!`);
-            }
-        }
-
-        function showToast(msg) {
-            const t = document.createElement('div');
-            t.className = 'fixed top-10 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-full z-[1000] shadow-2xl font-black italic text-[10px] uppercase tracking-widest animate-in slide-in-from-top duration-300';
-            t.innerHTML = `<span class="text-accent mr-2">✦</span> ${msg}`;
-            document.body.appendChild(t);
-            setTimeout(() => {
-                t.classList.add('opacity-0', 'transition-opacity');
-                setTimeout(() => t.remove(), 500);
-            }, 2500);
-        }
-
-        function setDiff(d) {
-            currentDiff = d;
-            document.querySelectorAll('.diff-btn').forEach(b => {
-                b.className = 'diff-btn flex-1 py-3 rounded-xl border border-transparent text-[9px] font-black uppercase transition-all opacity-40';
-            });
-            const active = document.getElementById('d-' + d);
-            active.className = 'diff-btn flex-1 py-3 rounded-xl border-2 border-accent text-[9px] font-black uppercase bg-accent/10 text-accent transition-all';
-        }
-
-        function openModal() { document.getElementById('modal').classList.remove('hidden'); document.getElementById('modal').classList.add('flex'); }
-        function closeModal() { document.getElementById('modal').classList.add('hidden'); document.getElementById('modal').classList.remove('flex'); }
-
-        function addHabit() {
-            const name = document.getElementById('h-input').value.trim();
-            if (!name) return;
-            habits.unshift({ id: Date.now(), name, done: false, streak: 0, difficulty: currentDiff });
-            document.getElementById('h-input').value = '';
-            closeModal();
-            save();
-            renderHabits();
-            showToast("Misi baru dimulai!");
-        }
-
-        function saveReflection() {
-            const val = document.getElementById('ref-input').value.trim();
-            if (!val) return;
-            reflections.unshift({ text: val, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) });
-            document.getElementById('ref-input').value = '';
-            userData.xp += 100;
-            save();
-            renderReflections();
-            updateStats();
-            showToast("+100 XP! Refleksi tersimpan.");
-        }
-
-        function renderReflections() {
+        function renderReflections(refs) {
             const container = document.getElementById('ref-history');
-            container.innerHTML = reflections.length ? '' : `<p class="text-center opacity-20 text-[10px] py-12 italic">Belum ada catatan refleksi hari ini.</p>`;
-            reflections.slice(0, 5).forEach(r => {
+            container.innerHTML = refs.length ? '' : `<p class="text-center opacity-20 text-[10px] py-12 italic">Belum ada catatan hari ini.</p>`;
+            refs.slice(0, 5).forEach(r => {
                 const div = document.createElement('div');
                 div.className = 'glass p-6 rounded-[2rem] opacity-70 hover:opacity-100 transition-opacity';
-                div.innerHTML = `<p class="text-sm italic mb-3 leading-relaxed">"${r.text}"</p><div class="flex items-center gap-2 opacity-30"><i data-lucide="clock" class="w-3 h-3"></i><span class="text-[8px] font-black uppercase tracking-tighter">${r.date}</span></div>`;
+                div.innerHTML = `<p class="text-sm italic mb-2">"${r.text}"</p><p class="text-[8px] font-black opacity-30 uppercase">${r.date}</p>`;
                 container.appendChild(div);
             });
             lucide.createIcons();
         }
 
-        window.onload = () => {
-            if (!userData.name) {
-                document.getElementById('onboarding').style.display = 'flex';
-            }
-            checkDailyReset();
-            applyTheme();
-            updateStats();
-            renderHabits();
-            document.getElementById('date-display').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
+        function renderThemeOptions() {
+            const container = document.getElementById('theme-options');
+            const themes = [
+                { id: 'dark', name: 'Midnight', color: '#6366f1' },
+                { id: 'nature', name: 'Greenery', color: '#10b981' },
+                { id: 'garnet', name: 'Garnet', color: '#ef4444' },
+                { id: 'light', name: 'Zenith', color: '#4f46e5' }
+            ];
+            container.innerHTML = themes.map((t, idx) => `
+                <button onclick="window.setTheme(${idx})" class="p-5 rounded-3xl border transition-all flex items-center justify-between group ${profile.theme === idx ? 'border-accent bg-accent/10' : 'border-white/10 hover:bg-white/5'}">
+                    <div class="flex items-center gap-4">
+                        <div class="w-7 h-7 rounded-full" style="background:${t.color}"></div>
+                        <span class="font-bold text-sm ${profile.theme === idx ? 'text-accent' : ''}">${t.name}</span>
+                    </div>
+                    ${profile.theme === idx ? '<span class="text-[8px] font-black uppercase bg-accent text-white px-3 py-1.5 rounded-full shadow-lg">Aktif</span>' : ''}
+                </button>
+            `).join('');
             lucide.createIcons();
+        }
+
+        function applyTheme() {
+            const themes = [
+                { id: 'dark', color: '#6366f1' },
+                { id: 'nature', color: '#10b981' },
+                { id: 'garnet', color: '#ef4444' },
+                { id: 'light', color: '#4f46e5' }
+            ];
+            const theme = themes[profile.theme] || themes[0];
+            document.body.setAttribute('data-theme', theme.id);
+            document.documentElement.style.setProperty('--primary', theme.color);
+        }
+
+        // --- GLOBAL UI CONTROLS ---
+        window.showTab = (id) => {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn, .mobile-nav').forEach(n => {
+                n?.classList?.remove('text-accent', 'bg-white/5', 'nav-active', 'opacity-100');
+                n?.classList?.add('opacity-30');
+            });
+
+            document.getElementById('nav-' + id)?.classList.add('text-accent', 'bg-white/5', 'nav-active');
+            document.getElementById('nav-' + id)?.classList.remove('opacity-30');
+            document.getElementById('m-nav-' + id)?.classList.add('text-accent', 'bg-white/5', 'opacity-100');
+            document.getElementById('m-nav-' + id)?.classList.remove('opacity-30');
+
+            if(id === 'planner') window.setEnergy('med');
         };
+
+        window.setEnergy = (level) => {
+            document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active-energy'));
+            document.getElementById('e-' + level).classList.add('active-energy');
+            const tasks = {
+                low: ["Meditasi Napas (5 menit)", "Minum segelas air dingin", "Peregangan otot ringan"],
+                med: ["Membaca 5 halaman buku", "Berjalan kaki 10 menit", "Merapikan meja kerja"],
+                high: ["Olahraga Intens 20 menit", "Fokus mendalam 45 menit", "Belajar skill baru"]
+            };
+            const container = document.getElementById('planner-tasks');
+            container.innerHTML = tasks[level].map((t, i) => `<div class="glass p-6 rounded-[2rem] border-l-4 border-accent text-xs font-bold animate-in slide-in-from-bottom duration-300" style="animation-delay: ${i*50}ms">${t}</div>`).join('');
+        };
+
+        window.showToast = (msg) => {
+            const t = document.createElement('div');
+            t.className = 'fixed top-10 left-1/2 -translate-x-1/2 glass px-8 py-4 rounded-full z-[2000] shadow-2xl font-black italic text-[10px] uppercase tracking-widest animate-in slide-in-from-top duration-300';
+            t.innerHTML = `<span class="text-accent mr-2">✦</span> ${msg}`;
+            document.body.appendChild(t);
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.remove(), 500); }, 2500);
+        };
+
+        window.setDiff = (d) => {
+            currentDiff = d;
+            document.querySelectorAll('.diff-btn').forEach(b => {
+                b.className = 'diff-btn flex-1 py-3 rounded-xl text-[9px] font-black uppercase transition-all opacity-40';
+            });
+            document.getElementById('d-' + d).className = 'diff-btn flex-1 py-3 rounded-xl border-2 border-accent text-[9px] font-black uppercase bg-accent/10 text-accent transition-all';
+        };
+
+        window.toggleThemePicker = () => {
+            const el = document.getElementById('theme-picker');
+            el.classList.toggle('hidden'); el.classList.toggle('flex');
+        };
+
+        window.openModal = () => { document.getElementById('modal').classList.remove('hidden'); document.getElementById('modal').classList.add('flex'); };
+        window.closeModal = () => { document.getElementById('modal').classList.add('hidden'); document.getElementById('modal').classList.remove('flex'); };
+
+        initAuth();
     </script>
 </body>
 </html>
