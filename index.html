@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HABITrack - Pro v5.2 Final</title>
+    <title>HABITrack - Pro v5.2 Cloud Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -84,24 +84,24 @@
     <!-- LOADING SCREEN -->
     <div id="loading-screen" class="fixed inset-0 flex flex-col items-center justify-center">
         <div class="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Menyelaraskan Data...</p>
+        <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Sinkronisasi Cloud...</p>
     </div>
 
-    <!-- ONBOARDING OVERLAY -->
+    <!-- ONBOARDING -->
     <div id="onboarding" class="fixed inset-0 hidden items-center justify-center p-6">
         <div class="glass w-full max-w-md p-10 rounded-[3.5rem] text-center space-y-8 animate-in zoom-in-95 duration-300">
             <img src="1774532838452.png" alt="Logo" class="h-20 w-20 mx-auto object-contain">
-            <h2 class="text-3xl font-black italic tracking-tighter leading-tight text-current">Petualangan <span class="text-accent">Habit</span></h2>
+            <h2 class="text-3xl font-black italic tracking-tighter leading-tight">Mulai Petualangan <br><span class="text-accent">Habit Kamu</span></h2>
             <div class="space-y-4">
                 <button onclick="loginCloud()" class="w-full py-5 bg-accent rounded-3xl text-white font-black text-lg shadow-xl active:scale-95 transition-all flex items-center justify-center gap-3">
-                    <i data-lucide="cloud"></i> Simpan di Cloud
+                    <i data-lucide="cloud"></i> Login dengan Google
                 </button>
                 <div class="flex items-center gap-4 opacity-20 py-2">
                     <hr class="flex-1 border-white/20"> <span class="text-[8px] font-bold uppercase">Atau</span> <hr class="flex-1 border-white/20">
                 </div>
                 <div class="space-y-3">
-                    <input id="guest-name-input" type="text" placeholder="Nama Panggilan..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-center outline-none focus:border-accent text-white">
-                    <button onclick="startAsGuest()" class="w-full py-4 border border-white/10 rounded-2xl font-bold opacity-60 hover:opacity-100 transition-all text-current">Lanjut sebagai Guest</button>
+                    <input id="guest-name-input" type="text" placeholder="Nama Guest..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-center outline-none focus:border-accent text-white">
+                    <button onclick="startAsGuest()" class="w-full py-4 border border-white/10 rounded-2xl font-bold opacity-60 hover:opacity-100 transition-all text-current">Lanjut Tanpa Akun</button>
                 </div>
             </div>
         </div>
@@ -125,7 +125,7 @@
                         <i data-lucide="award" class="w-6 h-6"></i>
                     </div>
                     <div class="flex-1 overflow-hidden">
-                        <p id="rank-name-side" class="text-[8px] font-black opacity-40 uppercase tracking-widest truncate text-current">Runner</p>
+                        <p id="rank-name-side" class="text-[8px] font-black opacity-40 uppercase tracking-widest truncate">Newbie</p>
                         <p class="xp-val font-bold text-base text-accent leading-none">0 XP</p>
                     </div>
                 </div>
@@ -154,7 +154,6 @@
         <!-- MAIN VIEWPORT -->
         <div id="main-scroll" class="flex-1 overflow-y-auto no-scrollbar relative z-10">
             
-            <!-- HEADER MOBILE -->
             <header class="sticky top-0 z-[100] px-6 py-6 flex justify-between items-center md:hidden bg-transparent">
                 <div class="flex items-center gap-3">
                     <img src="1774532838452.png" alt="Logo" class="h-8 w-8 object-contain">
@@ -172,10 +171,10 @@
                     <h2 class="text-4xl md:text-7xl font-black tracking-tighter italic leading-none text-current">
                         Halo, <span id="display-name" class="text-accent underline decoration-4 underline-offset-8">...</span>!
                     </h2>
-                    <p id="date-display" class="text-[10px] font-bold uppercase tracking-[0.2em] mt-6 opacity-40 text-current">Memuat...</p>
+                    <p id="date-display" class="text-[10px] font-bold uppercase tracking-[0.2em] mt-6 opacity-40 text-current">...</p>
                 </section>
 
-                <!-- TAB: HOME (HABITS) -->
+                <!-- TAB: HOME -->
                 <div id="tab-home" class="tab-content active space-y-8">
                     <div class="space-y-4">
                         <div class="flex justify-between items-center px-2">
@@ -184,7 +183,7 @@
                                 <i data-lucide="plus" class="w-7 h-7"></i>
                             </button>
                         </div>
-                        <div id="habit-list-active" class="flex flex-col gap-3 text-current"></div>
+                        <div id="habit-list-active" class="flex flex-col gap-3"></div>
                     </div>
                 </div>
 
@@ -192,7 +191,7 @@
                 <div id="tab-planner" class="tab-content space-y-10">
                     <div class="text-center space-y-2">
                         <h3 class="text-2xl font-black italic tracking-tighter uppercase text-current">Vibe Check ⚡</h3>
-                        <p class="text-xs opacity-40 italic text-current">Tentukan energi hari ini.</p>
+                        <p class="text-xs opacity-40 italic">Sesuaikan energi hari ini.</p>
                     </div>
                     <div class="flex gap-4">
                         <button onclick="setEnergy('low')" id="e-low" class="energy-btn flex-1 glass py-10 rounded-[2.5rem] flex flex-col items-center gap-3 text-current">
@@ -212,9 +211,9 @@
                 <div id="tab-reflection" class="tab-content space-y-8">
                     <div class="glass p-8 md:p-12 rounded-[3.5rem] space-y-8">
                         <div class="text-center">
-                            <h3 class="text-2xl font-black italic text-current">Jurnal Refleksi ✍️</h3>
+                            <h3 class="text-2xl font-black italic text-current">Journal Santai ✍️</h3>
                         </div>
-                        <textarea id="ref-input" placeholder="Tulis hal baik hari ini..." class="w-full h-40 bg-white/5 border border-white/10 rounded-3xl p-6 text-base outline-none focus:border-accent text-white resize-none transition-all"></textarea>
+                        <textarea id="ref-input" placeholder="Apa hal baik hari ini?" class="w-full h-40 bg-white/5 border border-white/10 rounded-3xl p-6 text-base outline-none focus:border-accent text-white resize-none transition-all"></textarea>
                         <button onclick="saveReflection()" class="w-full py-6 rounded-3xl bg-accent text-white font-black text-xl shadow-xl active:scale-95 transition-all">Simpan & +100 XP</button>
                     </div>
                     <div id="ref-history" class="space-y-4"></div>
@@ -226,55 +225,59 @@
                         <div class="w-28 h-28 mx-auto rounded-[2.5rem] bg-accent/20 flex items-center justify-center text-accent relative">
                             <i data-lucide="user" class="w-12 h-12"></i>
                             <div class="absolute -bottom-1 -right-1 w-8 h-8 bg-accent rounded-xl flex items-center justify-center text-white border-4 border-current">
-                                <i data-lucide="award" class="w-4 h-4"></i>
+                                <i data-lucide="check" class="w-4 h-4"></i>
                             </div>
                         </div>
                         <div>
-                            <h3 id="profile-display-name" class="text-3xl font-black italic tracking-tighter text-current">...</h3>
-                            <p id="profile-rank-label" class="text-[9px] font-black uppercase tracking-[0.3em] opacity-40 text-accent">Runner</p>
+                            <h3 id="profile-name" class="text-3xl font-black italic tracking-tighter text-current">...</h3>
+                            <p id="profile-rank" class="text-[9px] font-black uppercase tracking-[0.3em] opacity-40 text-accent">Peringkat Memuat...</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4 px-2">
                         <div class="glass p-6 rounded-[2rem] stat-card flex flex-col items-center gap-2">
-                            <span class="text-xl">🎯</span>
-                            <p id="stat-count-habits" class="text-xl font-black italic text-current">0</p>
-                            <p class="text-[7px] font-black uppercase opacity-30">Misi Tuntas</p>
+                            <span class="text-xl">🔥</span>
+                            <p id="stat-habits" class="text-xl font-black italic text-current">0</p>
+                            <p class="text-[7px] font-black uppercase opacity-30">Misi Selesai</p>
                         </div>
                         <div class="glass p-6 rounded-[2rem] stat-card flex flex-col items-center gap-2">
-                            <span class="text-xl">💎</span>
-                            <p id="stat-count-xp" class="text-xl font-black italic text-current">0</p>
+                            <span class="text-xl">✨</span>
+                            <p id="stat-xp" class="text-xl font-black italic text-current">0</p>
                             <p class="text-[7px] font-black uppercase opacity-30">Total XP</p>
                         </div>
                         <div class="glass p-6 rounded-[2rem] stat-card flex flex-col items-center gap-2">
-                            <span class="text-xl">📝</span>
-                            <p id="stat-count-refs" class="text-xl font-black italic text-current">0</p>
+                            <span class="text-xl">🖋️</span>
+                            <p id="stat-refs" class="text-xl font-black italic text-current">0</p>
                             <p class="text-[7px] font-black uppercase opacity-30">Refleksi</p>
                         </div>
                         <div class="glass p-6 rounded-[2rem] stat-card flex flex-col items-center gap-2">
-                            <span class="text-xl">🏆</span>
-                            <p id="stat-count-level" class="text-xl font-black italic text-current">1</p>
+                            <span class="text-xl">⭐</span>
+                            <p id="stat-level" class="text-xl font-black italic text-current">1</p>
                             <p class="text-[7px] font-black uppercase opacity-30">Level</p>
                         </div>
                     </div>
 
                     <div class="glass p-8 rounded-[3rem] space-y-6">
                         <div class="space-y-4">
-                            <label class="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 ml-2 text-current">Pengaturan Panggilan</label>
+                            <label class="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 ml-2">Ubah Nama Panggilan</label>
                             <div class="flex gap-2">
-                                <input id="nickname-edit-input" type="text" placeholder="Ganti nama..." class="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-accent text-white">
+                                <input id="edit-name-input" type="text" placeholder="Nama Baru..." class="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 text-sm font-bold outline-none focus:border-accent text-white">
                                 <button onclick="updateNickname()" class="px-6 bg-accent rounded-2xl text-white font-black text-xs shadow-lg active:scale-90 transition-all">Simpan</button>
                             </div>
                         </div>
+
                         <hr class="border-white/5">
+
                         <div class="space-y-3">
+                            <button onclick="toggleThemePicker()" class="w-full py-4 rounded-2xl border-2 border-white/10 text-current font-bold text-xs flex items-center justify-center gap-3 hover:bg-white/5 transition-all">
+                                <i data-lucide="palette" class="w-4 h-4"></i> Kustomisasi Tema
+                            </button>
                             <button onclick="logout()" class="w-full py-4 rounded-2xl border-2 border-rose-500/20 text-rose-500 font-bold text-xs flex items-center justify-center gap-3 hover:bg-rose-500/10 transition-all">
-                                <i data-lucide="log-out" class="w-4 h-4"></i> Keluar & Logout
+                                <i data-lucide="log-out" class="w-4 h-4"></i> Logout & Keluar
                             </button>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -287,11 +290,11 @@
         </nav>
     </div>
 
-    <!-- MODAL ADD HABIT -->
+    <!-- MODAL AD HABIT -->
     <div id="modal" class="fixed inset-0 hidden items-center justify-center p-6 text-current">
         <div class="glass w-full max-w-md p-10 rounded-[3.5rem] animate-in zoom-in-95 duration-200">
-            <h3 class="text-2xl font-black italic mb-8 text-center uppercase tracking-tighter">Misi Baru 🎯</h3>
-            <input id="h-input" type="text" placeholder="Misal: Belajar SQL 1 Jam" class="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-lg font-bold outline-none text-white mb-6 focus:border-accent">
+            <h3 class="text-2xl font-black italic mb-8 text-center uppercase tracking-tighter">Buat Target 🎯</h3>
+            <input id="h-input" type="text" placeholder="Nama Habit..." class="w-full bg-white/5 border border-white/10 rounded-3xl p-6 text-lg font-bold outline-none text-white mb-6 focus:border-accent">
             <div class="flex gap-2 p-1.5 glass rounded-2xl mb-6">
                 <button onclick="setDiff('easy')" id="d-easy" class="flex-1 py-3 rounded-xl text-[9px] font-black uppercase">Easy</button>
                 <button onclick="setDiff('medium')" id="d-medium" class="flex-1 py-3 rounded-xl text-[9px] font-black uppercase border-2 border-accent bg-accent/10 text-accent">Med</button>
@@ -308,18 +311,17 @@
     <div id="theme-picker" class="fixed inset-0 hidden items-center justify-center p-6 text-current">
         <div class="glass w-full max-w-sm p-10 rounded-[3.5rem] relative animate-in zoom-in-95 duration-200">
             <button onclick="toggleThemePicker()" class="absolute top-8 right-8 opacity-40 hover:opacity-100 transition-opacity text-current"><i data-lucide="x"></i></button>
-            <h3 class="font-black italic text-2xl mb-8 tracking-tighter">Gaya Visual 🎨</h3>
+            <h3 class="font-black italic text-2xl mb-8 tracking-tighter">Kustomisasi Tema 🎨</h3>
             <div id="theme-options" class="grid gap-3"></div>
         </div>
     </div>
 
     <script>
-        // --- SUPABASE CONFIG ---
+        // --- CONFIG & DB ---
         const SB_URL = 'https://etjykvytyblvnclcrwdx.supabase.co';
         const SB_KEY = 'sb_publishable_5yVj1ak_Lq1FkGbwlYL4yA_3FM2dJWh';
         const sb = supabase.createClient(SB_URL, SB_KEY);
 
-        // --- GLOBAL STATE ---
         let isGuest = localStorage.getItem('ht_mode') === 'guest';
         let currentUser = null;
         let userData = { name: "Pejuang", xp: 0, theme: 0 };
@@ -334,7 +336,7 @@
             { id: 'light', name: 'Zenith', color: '#4f46e5' }
         ];
 
-        // --- AUTH ENGINE ---
+        // --- AUTH LOGIC ---
         async function checkSession() {
             try {
                 const { data: { session } } = await sb.auth.getSession();
@@ -342,16 +344,16 @@
                     isGuest = false;
                     currentUser = session.user;
                     localStorage.setItem('ht_mode', 'cloud');
-                    await syncDataFromServer();
+                    await syncCloud();
                 } else if (isGuest) {
-                    loadLocalData();
+                    loadLocal();
                 } else {
                     document.getElementById('onboarding').style.display = 'flex';
                     document.getElementById('loading-screen').style.display = 'none';
                 }
             } catch (err) {
-                console.error("Critical Auth Fail:", err);
-                loadLocalData();
+                console.error("Auth Fail:", err);
+                loadLocal();
             }
         }
 
@@ -360,12 +362,12 @@
                 provider: 'google', 
                 options: { redirectTo: window.location.origin } 
             });
-            if(error) showToast("Error Login: " + error.message);
+            if(error) alert("Error Login: " + error.message);
         }
 
         function startAsGuest() {
             const name = document.getElementById('guest-name-input').value.trim();
-            if (!name) return showToast("Masukkan nama kamu!");
+            if (!name) return alert("Masukkan nama guest!");
             localStorage.setItem('ht_mode', 'guest');
             localStorage.setItem('ht_name_v52', name);
             location.reload();
@@ -376,57 +378,71 @@
             sb.auth.signOut().then(() => location.reload());
         }
 
+        // --- NICKNAME UPDATE ---
         async function updateNickname() {
-            const newName = document.getElementById('nickname-edit-input').value.trim();
+            const newName = document.getElementById('edit-name-input').value.trim();
             if (!newName) return showToast("Nama tidak boleh kosong!");
 
             if (isGuest) {
                 userData.name = newName;
                 localStorage.setItem('ht_name_v52', newName);
-                showToast("Nama Guest diperbarui!");
+                showToast("Nama Guest Berhasil Diubah!");
             } else {
                 const { error } = await sb.from('user_stats').update({ name: newName }).eq('id', currentUser.id);
                 if (!error) {
                     userData.name = newName;
-                    showToast("Nama Cloud disinkronkan!");
+                    showToast("Nama Cloud Berhasil Disinkron!");
+                } else {
+                    showToast("Gagal mengubah nama di Cloud.");
+                    return;
                 }
             }
-            document.getElementById('nickname-edit-input').value = '';
+            document.getElementById('edit-name-input').value = '';
             updateUI();
         }
 
         // --- DATA SYNC ---
-        async function syncDataFromServer() {
+        async function syncCloud() {
             try {
                 const { data: stats } = await sb.from('user_stats').select('*').eq('id', currentUser.id).single();
                 if (stats) {
                     userData = stats;
                 } else {
-                    const { data: newStats } = await sb.from('user_stats').insert([{ 
-                        id: currentUser.id, name: currentUser.user_metadata.full_name || "User Cloud", xp: 0, theme: 0 
+                    const { data } = await sb.from('user_stats').insert([{ 
+                        id: currentUser.id, 
+                        name: currentUser.user_metadata.full_name || "Pejuang Cloud", 
+                        xp: 0, theme: 0 
                     }]).select().single();
-                    userData = newStats;
+                    userData = data;
                 }
                 const { data: hb } = await sb.from('habits').select('*').order('id', { ascending: false });
                 habits = hb || [];
                 const { data: ref } = await sb.from('reflections').select('*').order('id', { ascending: false });
                 reflections = ref || [];
-                finalizeApp();
+                finalize();
             } catch (err) {
-                loadLocalData();
+                console.warn("Cloud sync fail, using local cache.");
+                loadLocal();
             }
         }
 
-        function loadLocalData() {
+        function loadLocal() {
             userData.name = localStorage.getItem('ht_name_v52') || "Guest";
             userData.xp = parseInt(localStorage.getItem('ht_xp_v52')) || 0;
             userData.theme = parseInt(localStorage.getItem('ht_theme_v52')) || 0;
             habits = JSON.parse(localStorage.getItem('ht_habits_v52')) || [];
             reflections = JSON.parse(localStorage.getItem('ht_refs_v52')) || [];
-            finalizeApp();
+            finalize();
         }
 
-        function finalizeApp() {
+        function saveLocal() {
+            localStorage.setItem('ht_xp_v52', userData.xp);
+            localStorage.setItem('ht_theme_v52', userData.theme);
+            localStorage.setItem('ht_habits_v52', JSON.stringify(habits));
+            localStorage.setItem('ht_refs_v52', JSON.stringify(reflections));
+        }
+
+        function finalize() {
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('date-display').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' });
             document.getElementById('mode-badge').innerText = isGuest ? "v5.2 Local" : "v5.2 Cloud";
@@ -434,19 +450,17 @@
             updateUI();
         }
 
-        // --- CORE ACTIONS ---
+        // --- ACTIONS ---
         async function addHabit() {
             const name = document.getElementById('h-input').value.trim();
             if (!name) return;
             const h = { name, difficulty: currentDiff, streak: 0, done: false };
-            if (isGuest) { 
-                h.id = Date.now(); habits.unshift(h); 
-                localStorage.setItem('ht_habits_v52', JSON.stringify(habits));
-            } else { 
-                const { data } = await sb.from('habits').insert([{ ...h, user_id: currentUser.id }]).select(); 
-                if(data) habits.unshift(data[0]); 
+            if (isGuest) { h.id = Date.now(); habits.unshift(h); saveLocal(); }
+            else { 
+                const { data, error } = await sb.from('habits').insert([{ ...h, user_id: currentUser.id }]).select(); 
+                if(!error) habits.unshift(data[0]); 
             }
-            closeModal(); updateUI(); showToast("Misi dimulai!");
+            closeModal(); updateUI(); showToast("Misi Baru Dimulai!");
         }
 
         async function toggleHabit(id) {
@@ -455,27 +469,19 @@
             h.done = true; h.streak++;
             const earned = { easy: 20, medium: 50, hard: 100 }[h.difficulty] || 50;
             userData.xp += earned;
-            
-            if (isGuest) {
-                localStorage.setItem('ht_xp_v52', userData.xp);
-                localStorage.setItem('ht_habits_v52', JSON.stringify(habits));
-            } else {
+            if (isGuest) saveLocal();
+            else {
                 await sb.from('habits').update({ done: true, streak: h.streak }).eq('id', id);
                 await sb.from('user_stats').update({ xp: userData.xp }).eq('id', currentUser.id);
             }
-            showToast(`+${earned} XP! Sempurna.`);
+            showToast(`+${earned} XP! Terus melangkah.`);
             updateUI();
         }
 
         async function deleteHabit(e, id) {
             e.stopPropagation();
-            if (isGuest) { 
-                habits = habits.filter(x => x.id !== id); 
-                localStorage.setItem('ht_habits_v52', JSON.stringify(habits));
-            } else { 
-                await sb.from('habits').delete().eq('id', id); 
-                habits = habits.filter(x => x.id !== id); 
-            }
+            if (isGuest) { habits = habits.filter(x => x.id !== id); saveLocal(); }
+            else { await sb.from('habits').delete().eq('id', id); habits = habits.filter(x => x.id !== id); }
             updateUI();
         }
 
@@ -484,25 +490,20 @@
             if (!text) return;
             const r = { text, date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) };
             userData.xp += 100;
-            if (isGuest) { 
-                reflections.unshift(r); 
-                localStorage.setItem('ht_xp_v52', userData.xp);
-                localStorage.setItem('ht_refs_v52', JSON.stringify(reflections));
-            } else {
+            if (isGuest) { reflections.unshift(r); saveLocal(); }
+            else {
                 const { data } = await sb.from('reflections').insert([{ ...r, user_id: currentUser.id }]).select();
                 await sb.from('user_stats').update({ xp: userData.xp }).eq('id', currentUser.id);
                 if(data) reflections.unshift(data[0]);
             }
-            document.getElementById('ref-input').value = ''; 
-            showToast("+100 XP! Refleksi dicatat."); 
-            updateUI();
+            document.getElementById('ref-input').value = ''; showToast("+100 XP! Refleksi tersimpan."); updateUI();
         }
 
-        // --- UI RENDERER ---
+        // --- UI ENGINE ---
         function updateUI() {
             const level = Math.floor(userData.xp / 1000) + 1;
             const rank = userData.xp >= 3000 ? "Consistency King" : userData.xp >= 1500 ? "Daily Warrior" : "Newbie Runner";
-            const finishedHabitsCount = habits.filter(h => h.done).length;
+            const finishedHabits = habits.filter(h => h.done).length;
 
             document.getElementById('display-name').innerText = userData.name;
             document.querySelectorAll('.xp-val').forEach(el => el.innerText = `${userData.xp.toLocaleString()} XP`);
@@ -512,21 +513,21 @@
             const sideRank = document.getElementById('rank-name-side');
             if(sideRank) sideRank.innerText = rank;
 
-            // Profile Update
-            document.getElementById('profile-display-name').innerText = userData.name;
-            document.getElementById('profile-rank-label').innerText = rank;
-            document.getElementById('stat-count-habits').innerText = finishedHabitsCount;
-            document.getElementById('stat-count-xp').innerText = userData.xp.toLocaleString();
-            document.getElementById('stat-count-refs').innerText = reflections.length;
-            document.getElementById('stat-count-level').innerText = level;
+            // Profile Tab
+            document.getElementById('profile-name').innerText = userData.name;
+            document.getElementById('profile-rank').innerText = rank;
+            document.getElementById('stat-habits').innerText = finishedHabits;
+            document.getElementById('stat-xp').innerText = userData.xp.toLocaleString();
+            document.getElementById('stat-refs').innerText = reflections.length;
+            document.getElementById('stat-level').innerText = level;
 
-            renderHabitList(); renderReflectionList(); lucide.createIcons();
+            renderHabits(); renderReflections(); lucide.createIcons();
         }
 
-        function renderHabitList() {
+        function renderHabits() {
             const list = document.getElementById('habit-list-active');
             if(!list) return;
-            list.innerHTML = habits.length ? '' : '<div class="p-12 text-center opacity-20 italic text-sm border-2 border-dashed border-white/10 rounded-[2.5rem] bg-white/5">Ketuk plus untuk misi hari ini.</div>';
+            list.innerHTML = habits.length ? '' : '<div class="p-12 text-center opacity-20 italic text-sm border-2 border-dashed border-white/10 rounded-[2.5rem] bg-white/5 text-current">Misi hari ini kosong. Tekan tombol plus untuk mulai.</div>';
             habits.forEach(h => {
                 const div = document.createElement('div');
                 div.className = `habit-card glass p-6 rounded-[2.5rem] flex items-center justify-between group cursor-pointer ${h.done ? 'done pointer-events-none' : ''}`;
@@ -536,13 +537,13 @@
             });
         }
 
-        function renderReflectionList() {
+        function renderReflections() {
             const list = document.getElementById('ref-history');
             if(!list) return;
-            list.innerHTML = reflections.length ? '' : '<p class="text-center opacity-20 text-[10px] py-6 italic text-current">Belum ada catatan.</p>';
-            reflections.slice(0, 3).forEach(r => {
+            list.innerHTML = reflections.length ? '' : '<p class="text-center opacity-20 text-[10px] py-6 italic text-current">Belum ada catatan refleksi.</p>';
+            reflections.slice(0, 5).forEach(r => {
                 const div = document.createElement('div');
-                div.className = 'glass p-6 rounded-[2rem] opacity-70';
+                div.className = 'glass p-6 rounded-[2rem] opacity-70 hover:opacity-100 transition-all';
                 div.innerHTML = `<p class="text-sm italic mb-2 text-current">"${r.text}"</p><p class="text-[8px] uppercase opacity-30 font-black text-current">${r.date}</p>`;
                 list.appendChild(div);
             });
@@ -552,7 +553,7 @@
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.getElementById('tab-' + id).classList.add('active');
             
-            // UI Sidebar
+            // Sidebar buttons
             document.querySelectorAll('aside nav button').forEach(b => {
                 b.classList.remove('text-accent', 'bg-white/5', 'opacity-100');
                 b.classList.add('opacity-30');
@@ -560,7 +561,7 @@
             const navBtn = document.getElementById('nav-' + id);
             if(navBtn) { navBtn.classList.replace('opacity-30', 'text-accent'); navBtn.classList.add('bg-white/5'); }
 
-            // UI Mobile
+            // Mobile buttons
             document.querySelectorAll('.md\\:hidden nav button').forEach(b => {
                 b.classList.remove('text-accent', 'opacity-100');
                 b.classList.add('opacity-20');
@@ -568,8 +569,10 @@
             const mBtn = document.getElementById('m-nav-' + id);
             if(mBtn) { mBtn.classList.remove('opacity-20'); mBtn.classList.add('text-accent', 'opacity-100'); }
 
-            const greet = document.getElementById('greeting-section');
-            greet.style.display = (id === 'home') ? 'block' : 'none';
+            // Hide greeting if not home
+            const greeting = document.getElementById('greeting-section');
+            if(id !== 'home') { if(greeting) greeting.style.display = 'none'; } 
+            else { if(greeting) greeting.style.display = 'block'; }
 
             if(id === 'planner') setEnergy('med');
             updateUI();
@@ -578,7 +581,7 @@
         function setEnergy(level) {
             document.querySelectorAll('.energy-btn').forEach(b => b.classList.remove('active-energy'));
             document.getElementById('e-' + level).classList.add('active-energy');
-            const tasks = { low: ["Meditasi (5m)", "Minum Air"], med: ["Baca 10 Menit", "Berjalan Kaki"], high: ["Olahraga Intens", "Deep Work 45m"] };
+            const tasks = { low: ["Meditasi (5m)", "Minum Air"], med: ["Membaca 10 Menit", "Berjalan Kaki"], high: ["Olahraga Intens", "Deep Work 45m"] };
             const container = document.getElementById('planner-tasks');
             if(container) container.innerHTML = tasks[level].map(t => `<div class="glass p-6 rounded-[2rem] border-l-4 border-accent font-bold text-xs text-current">${t}</div>`).join('');
         }
@@ -597,11 +600,8 @@
 
         async function setTheme(i) {
             userData.theme = i; applyTheme();
-            if (isGuest) {
-                localStorage.setItem('ht_theme_v52', i);
-            } else {
-                await sb.from('user_stats').update({ theme: i }).eq('id', currentUser.id);
-            }
+            if (isGuest) saveLocal();
+            else await sb.from('user_stats').update({ theme: i }).eq('id', currentUser.id);
         }
 
         function openModal() { document.getElementById('modal').style.display = 'flex'; }
